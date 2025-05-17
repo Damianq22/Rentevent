@@ -1,0 +1,553 @@
+---
+import { Icon } from "astro-icon/components";
+
+const response = await fetch("http://localhost:5183/api/Proveedores");
+let proveedores = [];
+
+if (response.ok) {
+  proveedores = await response.json();
+} else {
+  console.error("Error obteniendo proveedores:", response.statusText);
+}
+---
+
+<div class="shadow-md sm:rounded-lg bg-[#e9eef6] p-4 pb-2 w-full h-full">
+  <div class="flex items-center justify-between">
+    <!-- Contenedor para botones e input -->
+    <div class="flex items-center justify-between w-full">
+      <!-- Botones -->
+      <div class="flex items-center space-x-2">
+        <button
+          id="editarProveedor"
+          class="flex items-center text-black hover:bg-blue-300 p-1 rounded-md"
+        >
+          <Icon
+            name="actualizar"
+            class="w-6 h-6 mr-2 flex items-center text-[#4011ff]"
+          />
+          Actualizar
+        </button>
+        <button
+          id="eliminarProveedor"
+          class="flex items-center text-black hover:bg-red-300 p-1 rounded-md"
+        >
+          <Icon
+            name="eliminar"
+            class="w-6 h-6 mr-2 flex items-center text-[#df4d5e]"
+          />
+          Eliminar
+        </button>
+        <button
+          id="agregarProveedor"
+          class="flex items-center text-black hover:bg-green-300 p-1 rounded-md"
+        >
+          <Icon
+            name="add"
+            class="w-6 h-6 mr-2 flex items-center text-[#29b73a96]"
+          />
+          Agregar
+        </button>
+      </div>
+      <!-- Input de búsqueda -->
+      <div class="relative ml-auto">
+        <div
+          class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+        >
+          <svg
+            class="w-4 h-4 text-gray-500 dark:text-gray-400"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 20 20"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"></path>
+          </svg>
+        </div>
+        <input
+          type="text"
+          id="inputSearch"
+          class="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-[#e9eef6] focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          placeholder="Buscar Proveedor"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de proveedores -->
+  <table
+    class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 mt-2"
+  >
+    <thead
+      class="text-xs text-pink-800 uppercase bg-gray-50 dark:bg-gray-900 dark:text-pink-500"
+    >
+      <tr>
+        <th scope="col" class="p-4">
+          <Icon name="square" />
+        </th>
+        <th scope="col" class="px-6 py-3">Nombre</th>
+        <th scope="col" class="px-6 py-3">Teléfono</th>
+        <th scope="col" class="px-6 py-3">Acciones</th>
+      </tr>
+    </thead>
+
+    <tbody id="proveedorTable">
+      {
+        proveedores.length > 0 ? (
+          proveedores.map((proveedor) => (
+            <tr class="border-b bg-[#e9eef6] dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-400">
+              <td class="w-4 p-4">
+                <input
+                  type="checkbox"
+                  class="form-checkbox proveedorCheckbox"
+                  data-id={proveedor.id}
+                />
+              </td>
+              <td class="px-6 py-4 text-black font-semibold">
+                {proveedor.nombre}
+              </td>
+              <td class="px-6 py-4 text-black">{proveedor.telefono}</td>
+              <td class="px-6 py-4">
+                <button
+                  class="text-blue-600 hover:text-blue-900 mr-3 editar-btn"
+                  data-id={proveedor.id}
+                >
+                  <Icon name="actualizar" class="w-5 h-5" />
+                </button>
+                <button
+                  class="text-red-600 hover:text-red-900 eliminar-btn"
+                  data-id={proveedor.id}
+                >
+                  <Icon name="eliminar" class="w-5 h-5" />
+                </button>
+              </td>
+            </tr>
+          ))
+        ) : (
+          <tr>
+            <td colspan="4" class="px-6 py-4 text-center">
+              No se encontraron proveedores
+            </td>
+          </tr>
+        )
+      }
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal para agregar proveedor -->
+<div
+  id="modalAgregar"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden"
+>
+  <div class="bg-white p-5 rounded-lg w-full max-w-md">
+    <h3 class="text-xl font-semibold mb-6 text-black text-center">
+      Agregar Proveedor
+    </h3>
+    <form id="formAgregarProveedor">
+      <div class="space-y-4">
+        <!-- Nombre -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Nombre</label
+          >
+          <input
+            type="text"
+            name="nombre"
+            class="block w-full p-2 border border-gray-300 rounded-md text-black focus:ring-blue-500 focus:border-blue-500"
+            required
+          />
+        </div>
+
+        <!-- Teléfono -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Teléfono</label
+          >
+          <input
+            type="tel"
+            name="telefono"
+            class="block w-full p-2 border border-gray-300 rounded-md text-black focus:ring-blue-500 focus:border-blue-500"
+            required
+          />
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="flex justify-end mt-6 space-x-3">
+        <button
+          type="button"
+          id="cancelarModal"
+          class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+        >
+          Guardar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal para editar proveedor -->
+<div
+  id="modalEditar"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden"
+>
+  <div class="bg-white p-5 rounded-lg w-full max-w-md">
+    <h3 class="text-xl font-semibold mb-6 text-black text-center">
+      Editar Proveedor
+    </h3>
+    <form id="formEditarProveedor">
+      <input type="hidden" name="id" id="editProveedorId" />
+      <div class="space-y-4">
+        <!-- Nombre -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Nombre</label
+          >
+          <input
+            type="text"
+            name="nombre"
+            id="editProveedorNombre"
+            class="block w-full p-2 border border-gray-300 rounded-md text-black focus:ring-blue-500 focus:border-blue-500"
+            required
+          />
+        </div>
+
+        <!-- Teléfono -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Teléfono</label
+          >
+          <input
+            type="tel"
+            name="telefono"
+            id="editProveedorTelefono"
+            class="block w-full p-2 border border-gray-300 rounded-md text-black focus:ring-blue-500 focus:border-blue-500"
+            required
+          />
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="flex justify-end mt-6 space-x-3">
+        <button
+          type="button"
+          id="cancelarModalEditar"
+          class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+        >
+          Actualizar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Variables globales
+  let proveedoresData = [];
+
+  // Función para cargar proveedores
+  async function cargarProveedores() {
+    try {
+      const response = await fetch("https://localhost:7280/api/Proveedores");
+      if (response.ok) {
+        proveedoresData = await response.json();
+        actualizarTablaProveedores(proveedoresData);
+      } else {
+        console.error("Error cargando proveedores:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
+
+  // Función para actualizar la tabla
+  function actualizarTablaProveedores(
+    proveedores: Array<{ id: number; nombre: string; telefono: string }>
+  ) {
+    const tbody = document.getElementById("proveedorTable");
+    if (!tbody) return;
+
+    tbody.innerHTML = proveedores
+      .map(
+        (proveedor) => `
+      <tr class="border-b bg-[#e9eef6] hover:bg-gray-50">
+        <td class="w-4 p-4">
+          <input type="checkbox" class="form-checkbox proveedorCheckbox" data-id="${proveedor.id}" />
+        </td>
+        <td class="px-6 py-4 text-black font-semibold">${proveedor.nombre}</td>
+        <td class="px-6 py-4 text-black">${proveedor.telefono}</td>
+        <td class="px-6 py-4">
+          <button class="text-blue-600 hover:text-blue-900 mr-3 editar-btn" data-id="${proveedor.id}">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </button>
+          <button class="text-red-600 hover:text-red-900 eliminar-btn" data-id="${proveedor.id}">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </td>
+      </tr>
+    `
+      )
+      .join("");
+
+    // Asignar eventos a los botones dinámicos
+    document.querySelectorAll(".editar-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        const target = e.currentTarget as HTMLElement;
+        const id = target.dataset.id;
+        if (id) editarProveedorModal(parseInt(id));
+      });
+    });
+
+    document.querySelectorAll(".eliminar-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        const target = e.currentTarget as HTMLElement;
+        const id = target.dataset.id;
+        if (id) confirmarEliminarProveedor(parseInt(id));
+      });
+    });
+  }
+
+  // Función para buscar proveedores
+  function buscarProveedores() {
+    const input = document.getElementById("inputSearch");
+    if (!input) return;
+
+    input.addEventListener("input", (e) => {
+      const target = e.target as HTMLInputElement;
+      const searchTerm = target.value.toLowerCase();
+      const filtered = proveedoresData.filter(
+        (proveedor) =>
+          proveedor.nombre.toLowerCase().includes(searchTerm) ||
+          proveedor.telefono.toLowerCase().includes(searchTerm)
+      );
+      actualizarTablaProveedores(filtered);
+    });
+  }
+
+  // Función para abrir modal de edición
+  function editarProveedorModal(id: number) {
+    const proveedor = proveedoresData.find((p) => p.id === id);
+    if (!proveedor) return;
+
+    const idInput = document.getElementById(
+      "editProveedorId"
+    ) as HTMLInputElement;
+    const nombreInput = document.getElementById(
+      "editProveedorNombre"
+    ) as HTMLInputElement;
+    const telefonoInput = document.getElementById(
+      "editProveedorTelefono"
+    ) as HTMLInputElement;
+    const modalEditar = document.getElementById("modalEditar");
+
+    if (idInput && nombreInput && telefonoInput && modalEditar) {
+      idInput.value = proveedor.id.toString();
+      nombreInput.value = proveedor.nombre;
+      telefonoInput.value = proveedor.telefono;
+      modalEditar.classList.remove("hidden");
+    }
+  }
+
+  // Función para confirmar eliminación
+  function confirmarEliminarProveedor(id: number) {
+    console.log(id);
+    if (confirm("¿Estás seguro de que deseas eliminar este proveedor?")) {
+      eliminarProveedor(id);
+    }
+  }
+
+  // Función para eliminar proveedor
+  async function eliminarProveedor(id: number) {
+    try {
+      const response = await fetch(
+        `https://localhost:7280/api/Proveedores/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (response.ok) {
+        alert("Proveedor eliminado correctamente");
+        await cargarProveedores();
+      } else {
+        alert("Error al eliminar el proveedor");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Error al eliminar el proveedor");
+    }
+  }
+
+  // Eventos del DOM
+  document.addEventListener("DOMContentLoaded", () => {
+    // Cargar proveedores al inicio
+    cargarProveedores();
+    buscarProveedores();
+
+    // Modal agregar
+    const modalAgregar = document.getElementById("modalAgregar");
+    const btnAgregar = document.getElementById("agregarProveedor");
+    const btnCancelar = document.getElementById("cancelarModal");
+    const btnCancelarEditar = document.getElementById("cancelarModalEditar");
+
+    if (btnAgregar && modalAgregar) {
+      btnAgregar.addEventListener("click", () => {
+        modalAgregar.classList.remove("hidden");
+      });
+    }
+
+    if (btnCancelar && modalAgregar) {
+      btnCancelar.addEventListener("click", () => {
+        modalAgregar.classList.add("hidden");
+      });
+    }
+
+    // Modal editar
+    const modalEditar = document.getElementById("modalEditar");
+    if (btnCancelarEditar && modalEditar) {
+      btnCancelarEditar.addEventListener("click", () => {
+        modalEditar.classList.add("hidden");
+      });
+    }
+
+    // Cerrar modales al hacer clic fuera
+    window.addEventListener("click", (e) => {
+      if (e.target === modalAgregar) {
+        (e.target as HTMLElement).classList.add("hidden");
+      }
+      if (e.target === modalEditar) {
+        (e.target as HTMLElement).classList.add("hidden");
+      }
+    });
+
+    // Formulario agregar
+    const formAgregar = document.getElementById(
+      "formAgregarProveedor"
+    ) as HTMLFormElement;
+    if (formAgregar) {
+      formAgregar.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(formAgregar);
+
+        try {
+          const response = await fetch(
+            "https://localhost:7280/api/Proveedores",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                nombre: formData.get("nombre") as string,
+                telefono: formData.get("telefono") as string,
+              }),
+            }
+          );
+
+          if (response.ok) {
+            alert("Proveedor agregado correctamente");
+            formAgregar.reset();
+            if (modalAgregar) modalAgregar.classList.add("hidden");
+            await cargarProveedores();
+          } else {
+            alert("Error al agregar el proveedor");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("Error al agregar el proveedor");
+        }
+      });
+    }
+
+    // Formulario editar
+    const formEditar = document.getElementById(
+      "formEditarProveedor"
+    ) as HTMLFormElement;
+    if (formEditar) {
+      formEditar.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(formEditar);
+        const id = formData.get("id");
+
+        try {
+          const response = await fetch(
+            `https://localhost:7280/api/Proveedores/${id}`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                id: parseInt(id as string),
+                nombre: formData.get("nombre") as string,
+                telefono: formData.get("telefono") as string,
+              }),
+            }
+          );
+
+          if (response.ok) {
+            alert("Proveedor actualizado correctamente");
+            if (modalEditar) modalEditar.classList.add("hidden");
+            await cargarProveedores();
+          } else {
+            alert("Error al actualizar el proveedor");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("Error al actualizar el proveedor");
+        }
+      });
+    }
+
+    // Botones de acción masiva
+    const btnEditar = document.getElementById("editarProveedor");
+    const btnEliminar = document.getElementById("eliminarProveedor");
+
+    if (btnEditar) {
+      btnEditar.addEventListener("click", () => {
+        const checkbox = document.querySelector(
+          ".proveedorCheckbox:checked"
+        ) as HTMLInputElement;
+        if (checkbox && checkbox.dataset.id) {
+          editarProveedorModal(parseInt(checkbox.dataset.id));
+        } else {
+          alert("Seleccione un proveedor para editar");
+        }
+      });
+    }
+
+    if (btnEliminar) {
+      btnEliminar.addEventListener("click", () => {
+        const checkbox = document.querySelector(
+          ".proveedorCheckbox:checked"
+        ) as HTMLInputElement;
+        if (checkbox && checkbox.dataset.id) {
+          confirmarEliminarProveedor(parseInt(checkbox.dataset.id));
+        } else {
+          alert("Seleccione un proveedor para eliminar");
+        }
+      });
+    }
+  });
+</script>

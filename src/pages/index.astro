@@ -1,11 +1,64 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import Layout from "../layouts/Layout.astro";
+import "../styles/login.css";
 ---
 
 <Layout>
-	<Welcome />
+  <div class="loginPage flex">
+    <div class="container flex">
+      <div class="videoDiv">
+        <video src="/image/clipLogo.mp4" autoplay muted loop></video>
+
+        <div class="footerDiv flex">
+          <span class="text-white">Bienvenido a tu Renta de Alquiler.</span>
+          <!-- <button class="btn">Crear Cuenta</button> -->
+        </div>
+      </div>
+
+      <div
+        class="formDiv w-full h-full flex flex-col justify-center items-center"
+      >
+        <div class="">
+          <h1 class="title text-4xl font-bold text-center text-pink-800 mb-2">
+            Rent4Even
+          </h1>
+        </div>
+
+        <form id="empresaForm" class="form grid" method="POST">
+          <div class="inputDiv">
+            <label for="username" class="username">Usuario</label>
+            <div class="input flex">
+              <input
+                placeholder="Ingrese su usuario"
+                type="text"
+                id="username"
+                name="email"
+              />
+            </div>
+          </div>
+
+          <div class="inputDiv">
+            <label for="password" class="password">Contraseña</label>
+            <div class="input flex">
+              <input
+                placeholder="Ingrese su contraseña"
+                type="password"
+                id="password"
+                name="password"
+              />
+            </div>
+          </div>
+          <button type="submit" class="btn flex">
+            <span>Login</span>
+          </button>
+        </form>
+
+        <div
+          id="errorMessage"
+          class="text-red-700 text-center hidden text-sm mt-4"
+        >
+        </div>
+      </div>
+    </div>
+  </div>
 </Layout>

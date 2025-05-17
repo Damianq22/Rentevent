@@ -1,0 +1,123 @@
+---
+import { Icon } from "astro-icon/components";
+
+const { currentView } = Astro.props;
+console.log("Veamos que hay aqui", currentView);
+const isActive = (view) => {
+  if (!currentView && view === "gestion-usuarios") return true;
+  return currentView === view;
+};
+---
+
+<div class="flex flex-col bg-gray-50 text-gray-800 font-sans">
+  <div
+    class="fixed flex flex-col top-0 left-0 w-64 bg-white h-full border-r shadow-sm"
+  >
+    <div class="flex items-center justify-center h-16 border-b">
+      <h1
+        class="text-3xl sm:text-4xl md:text-4xl font-extrabold text-pink-600 tracking-tight text-center uppercase drop-shadow-md"
+      >
+        Rent4<span class="text-pink-400">Even</span>
+      </h1>
+    </div>
+    <div class="overflow-y-auto overflow-x-hidden flex-grow px-2 py-4">
+      <ul class="space-y-1">
+        <!-- Sección: Menu -->
+        <li
+          class="px-4 text-xs text-gray-400 font-semibold uppercase tracking-wider mb-2"
+        >
+          Menu
+        </li>
+
+        <li>
+          <a
+            href="#"
+            class="flex items-center gap-3 h-11 px-4 rounded-lg text-sm font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition"
+          >
+            <Icon name="categoria" class="w-5 h-5 text-indigo-600" />
+            Categorias
+          </a>
+        </li>
+        <li>
+          <a
+            href="#"
+            class="flex items-center gap-3 h-11 px-4 rounded-lg text-sm font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition"
+          >
+            <Icon name="list" class="w-5 h-5 text-indigo-600" />
+            Articulos
+          </a>
+        </li>
+        <li>
+          <a
+            href="#"
+            class="flex items-center gap-3 h-11 px-4 rounded-lg text-sm font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition"
+          >
+            <Icon name="alquiler" class="w-5 h-5 text-indigo-600" />
+            Alquileres
+          </a>
+        </li>
+
+        <!-- Sección: Tasks -->
+        <li
+          class="px-4 mt-4 text-xs text-gray-400 font-semibold uppercase tracking-wider mb-2"
+        >
+          Acciones
+        </li>
+        <li>
+          <a
+            href="/gestion?view=gestion-usuarios"
+            class={`flex items-center gap-3 h-11 px-4 rounded-lg text-sm font-medium transition 
+            ${isActive("gestion-usuarios") ? "bg-green-100 text-green-600 font-semibold" : "text-black hover:bg-gray-100"}`}
+          >
+            <Icon name="profile" class="w-5 h-5 text-indigo-600" />
+            Usuarios
+          </a>
+        </li>
+        <li>
+          <a
+            href="#"
+            class="flex items-center gap-3 h-11 px-4 rounded-lg text-sm font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition"
+          >
+            <Icon name="task" class="w-5 h-5 text-indigo-600" />
+            Facturas
+          </a>
+        </li>
+        <li>
+          <a
+            href="#"
+            class="flex items-center gap-3 h-11 px-4 rounded-lg text-sm font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition"
+          >
+            <Icon name="client" class="w-5 h-5 text-indigo-600" />
+            Clientes
+          </a>
+        </li>
+        <li>
+          <a
+            href="/gestion?view=gestion-proveedores"
+            class={`flex items-center gap-3 h-11 px-4 rounded-lg text-sm font-medium transition 
+            ${isActive("gestion-proveedores") ? "bg-green-100 text-green-600 font-semibold" : "text-black hover:bg-gray-100"}`}
+          >
+            <Icon name="proveedor" class="w-5 h-5 text-indigo-600" />
+            Proveedores
+          </a>
+        </li>
+
+        <!-- Sección: Settings -->
+        <li
+          class="px-4 mt-4 text-xs text-gray-400 font-semibold uppercase tracking-wider mb-2"
+        >
+          Session
+        </li>
+        <li>
+          <a
+            href="#"
+            class="flex items-center gap-3 h-11 px-4 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 transition"
+          >
+            <Icon name="logout" class="w-5 h-5 text-red-500" />
+            Logout
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
