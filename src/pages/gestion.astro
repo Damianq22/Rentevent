@@ -5,9 +5,7 @@ import Sidebar from "../components/UI/Sidebar.astro";
 import LayoutGestion from "../layouts/LayoutGestion.astro";
 
 const params = Astro.url.searchParams;
-console.log("Params:", params);
 const view = params.get("view");
-console.log("jajajajaj View:", params.get("currentView"));
 
 let SelectedComponent;
 switch (view) {

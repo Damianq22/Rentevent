@@ -2,7 +2,6 @@
 import { Icon } from "astro-icon/components";
 
 const { currentView } = Astro.props;
-console.log("Veamos que hay aqui", currentView);
 const isActive = (view) => {
   if (!currentView && view === "gestion-usuarios") return true;
   return currentView === view;
