@@ -1,13 +1,14 @@
 ---
 import { Icon } from "astro-icon/components";
 
-const response = await fetch("http://localhost:5183/api/Proveedores");
-let proveedores = [];
+// Lógica para obtener clientes
+const response = await fetch("http://localhost:5183/api/Clientes");
+let clientes = [];
 
 if (response.ok) {
-  proveedores = await response.json();
+  clientes = await response.json();
 } else {
-  console.error("Error obteniendo proveedores:", response.statusText);
+  console.error("Error obteniendo clientes:", response.statusText);
 }
 ---
 
@@ -18,7 +19,7 @@ if (response.ok) {
       <!-- Botones -->
       <div class="flex items-center space-x-2">
         <button
-          id="agregarProveedor"
+          id="agregarCliente"
           class="flex items-center text-black hover:bg-green-300 p-1 rounded-md border border-gray-300"
         >
           <Icon
@@ -52,13 +53,13 @@ if (response.ok) {
           type="text"
           id="inputSearch"
           class="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-[#e9eef6] focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          placeholder="Buscar Proveedor"
+          placeholder="Buscar Cliente"
         />
       </div>
     </div>
   </div>
 
-  <!-- Tabla de proveedores -->
+  <!-- Tabla de clientes -->
   <table
     class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 mt-2"
   >
@@ -69,38 +70,42 @@ if (response.ok) {
         <th scope="col" class="p-4">
           <Icon name="square" />
         </th>
+        <th scope="col" class="px-6 py-3">Cédula</th>
         <th scope="col" class="px-6 py-3">Nombre</th>
         <th scope="col" class="px-6 py-3">Teléfono</th>
+        <th scope="col" class="px-6 py-3">Dirección</th>
         <th scope="col" class="px-6 py-3">Acciones</th>
       </tr>
     </thead>
 
-    <tbody id="proveedorTable">
+    <tbody id="clienteTable">
       {
-        proveedores.length > 0 ? (
-          proveedores.map((proveedor) => (
+        clientes.length > 0 ? (
+          clientes.map((cliente) => (
             <tr class="border-b bg-[#e9eef6] dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-400">
               <td class="w-4 p-4">
                 <input
                   type="checkbox"
-                  class="form-checkbox proveedorCheckbox"
-                  data-id={proveedor.id}
+                  class="form-checkbox clienteCheckbox"
+                  data-id={cliente.id}
                 />
               </td>
+              <td class="px-6 py-4 text-black">{cliente.id}</td>
               <td class="px-6 py-4 text-black font-semibold">
-                {proveedor.nombre}
+                {cliente.nombre}
               </td>
-              <td class="px-6 py-4 text-black">{proveedor.telefono}</td>
+              <td class="px-6 py-4 text-black">{cliente.telefono}</td>
+              <td class="px-6 py-4 text-black">{cliente.direccion}</td>
               <td class="px-6 py-4">
                 <button
                   class="text-blue-600 hover:text-blue-900 mr-3 editar-btn"
-                  data-id={proveedor.id}
+                  data-id={cliente.id}
                 >
                   <Icon name="actualizar" class="w-5 h-5" />
                 </button>
                 <button
                   class="text-red-600 hover:text-red-900 eliminar-btn"
-                  data-id={proveedor.id}
+                  data-id={cliente.id}
                 >
                   <Icon name="eliminar" class="w-5 h-5" />
                 </button>
@@ -109,8 +114,8 @@ if (response.ok) {
           ))
         ) : (
           <tr>
-            <td colspan="4" class="px-6 py-4 text-center">
-              No se encontraron proveedores
+            <td colspan="6" class="px-6 py-4 text-center">
+              No se encontraron clientes
             </td>
           </tr>
         )
@@ -119,17 +124,30 @@ if (response.ok) {
   </table>
 </div>
 
-<!-- Modal para agregar proveedor -->
+<!-- Modal para agregar cliente -->
 <div
   id="modalAgregar"
   class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden"
 >
   <div class="bg-white p-5 rounded-lg w-full max-w-md">
     <h3 class="text-xl font-semibold mb-6 text-black text-center">
-      Agregar Proveedor
+      Agregar Cliente
     </h3>
-    <form id="formAgregarProveedor">
+    <form id="formAgregarCliente">
       <div class="space-y-4">
+        <!-- Cédula -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Cédula</label
+          >
+          <input
+            type="number"
+            name="id"
+            class="block w-full p-2 border border-gray-300 rounded-md text-black focus:ring-blue-500 focus:border-blue-500"
+            required
+          />
+        </div>
+
         <!-- Nombre -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1"
@@ -151,6 +169,19 @@ if (response.ok) {
           <input
             type="tel"
             name="telefono"
+            class="block w-full p-2 border border-gray-300 rounded-md text-black focus:ring-blue-500 focus:border-blue-500"
+            required
+          />
+        </div>
+
+        <!-- Dirección -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Dirección</label
+          >
+          <input
+            type="text"
+            name="direccion"
             class="block w-full p-2 border border-gray-300 rounded-md text-black focus:ring-blue-500 focus:border-blue-500"
             required
           />
@@ -177,17 +208,17 @@ if (response.ok) {
   </div>
 </div>
 
-<!-- Modal para editar proveedor -->
+<!-- Modal para editar cliente -->
 <div
   id="modalEditar"
   class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden"
 >
   <div class="bg-white p-5 rounded-lg w-full max-w-md">
     <h3 class="text-xl font-semibold mb-6 text-black text-center">
-      Editar Proveedor
+      Editar Cliente
     </h3>
-    <form id="formEditarProveedor">
-      <input type="hidden" name="id" id="editProveedorId" />
+    <form id="formEditarCliente">
+      <input type="hidden" name="id" id="editClienteId" />
       <div class="space-y-4">
         <!-- Nombre -->
         <div>
@@ -197,7 +228,7 @@ if (response.ok) {
           <input
             type="text"
             name="nombre"
-            id="editProveedorNombre"
+            id="editClienteNombre"
             class="block w-full p-2 border border-gray-300 rounded-md text-black focus:ring-blue-500 focus:border-blue-500"
             required
           />
@@ -211,7 +242,21 @@ if (response.ok) {
           <input
             type="tel"
             name="telefono"
-            id="editProveedorTelefono"
+            id="editClienteTelefono"
+            class="block w-full p-2 border border-gray-300 rounded-md text-black focus:ring-blue-500 focus:border-blue-500"
+            required
+          />
+        </div>
+
+        <!-- Dirección -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Dirección</label
+          >
+          <input
+            type="text"
+            name="direccion"
+            id="editClienteDireccion"
             class="block w-full p-2 border border-gray-300 rounded-md text-black focus:ring-blue-500 focus:border-blue-500"
             required
           />
@@ -240,17 +285,22 @@ if (response.ok) {
 
 <script>
   // Variables globales
-  let proveedoresData = [];
+  let clientesData: Array<{
+    id: number;
+    nombre: string;
+    telefono: string;
+    direccion: string;
+  }> = [];
 
-  // Función para cargar proveedores
-  async function cargarProveedores() {
+  // Función para cargar clientes
+  async function cargarClientes() {
     try {
-      const response = await fetch("http://localhost:5183/api/Proveedores");
+      const response = await fetch("http://localhost:5183/api/Clientes");
       if (response.ok) {
-        proveedoresData = await response.json();
-        actualizarTablaProveedores(proveedoresData);
+        clientesData = await response.json();
+        actualizarTablaClientes(clientesData);
       } else {
-        console.error("Error cargando proveedores:", response.statusText);
+        console.error("Error cargando clientes:", response.statusText);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -258,28 +308,28 @@ if (response.ok) {
   }
 
   // Función para actualizar la tabla
-  function actualizarTablaProveedores(
-    proveedores: Array<{ id: number; nombre: string; telefono: string }>
-  ) {
-    const tbody = document.getElementById("proveedorTable");
+  function actualizarTablaClientes(clientes: typeof clientesData) {
+    const tbody = document.getElementById("clienteTable");
     if (!tbody) return;
 
-    tbody.innerHTML = proveedores
+    tbody.innerHTML = clientes
       .map(
-        (proveedor) => `
+        (cliente) => `
       <tr class="border-b bg-[#e9eef6] hover:bg-gray-50">
         <td class="w-4 p-4">
-          <input type="checkbox" class="form-checkbox proveedorCheckbox" data-id="${proveedor.id}" />
+          <input type="checkbox" class="form-checkbox clienteCheckbox" data-id="${cliente.id}" />
         </td>
-        <td class="px-6 py-4 text-black font-semibold">${proveedor.nombre}</td>
-        <td class="px-6 py-4 text-black">${proveedor.telefono}</td>
+        <td class="px-6 py-4 text-black">${cliente.id}</td>
+        <td class="px-6 py-4 text-black font-semibold">${cliente.nombre}</td>
+        <td class="px-6 py-4 text-black">${cliente.telefono}</td>
+        <td class="px-6 py-4 text-black">${cliente.direccion}</td>
         <td class="px-6 py-4">
-          <button class="text-blue-600 hover:text-blue-900 mr-3 editar-btn" data-id="${proveedor.id}">
+          <button class="text-blue-600 hover:text-blue-900 mr-3 editar-btn" data-id="${cliente.id}">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
           </button>
-          <button class="text-red-600 hover:text-red-900 eliminar-btn" data-id="${proveedor.id}">
+          <button class="text-red-600 hover:text-red-900 eliminar-btn" data-id="${cliente.id}">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg>
@@ -295,7 +345,7 @@ if (response.ok) {
       btn.addEventListener("click", (e) => {
         const target = e.currentTarget as HTMLElement;
         const id = target.dataset.id;
-        if (id) editarProveedorModal(parseInt(id));
+        if (id) editarClienteModal(parseInt(id));
       });
     });
 
@@ -303,91 +353,99 @@ if (response.ok) {
       btn.addEventListener("click", (e) => {
         const target = e.currentTarget as HTMLElement;
         const id = target.dataset.id;
-        if (id) confirmarEliminarProveedor(parseInt(id));
+        if (id) confirmarEliminarCliente(parseInt(id));
       });
     });
   }
 
-  // Función para buscar proveedores
-  function buscarProveedores() {
+  // Función para buscar clientes
+  function buscarClientes() {
     const input = document.getElementById("inputSearch");
     if (!input) return;
 
     input.addEventListener("input", (e) => {
       const target = e.target as HTMLInputElement;
       const searchTerm = target.value.toLowerCase();
-      const filtered = proveedoresData.filter(
-        (proveedor) =>
-          proveedor.nombre.toLowerCase().includes(searchTerm) ||
-          proveedor.telefono.toLowerCase().includes(searchTerm)
+      const filtered = clientesData.filter(
+        (cliente) =>
+          cliente.nombre.toLowerCase().includes(searchTerm) ||
+          cliente.telefono.toLowerCase().includes(searchTerm) ||
+          cliente.direccion.toLowerCase().includes(searchTerm) ||
+          cliente.id.toString().includes(searchTerm)
       );
-      actualizarTablaProveedores(filtered);
+      actualizarTablaClientes(filtered);
     });
   }
 
   // Función para abrir modal de edición
-  function editarProveedorModal(id: number) {
-    const proveedor = proveedoresData.find((p) => p.id === id);
-    if (!proveedor) return;
+  function editarClienteModal(id: number) {
+    const cliente = clientesData.find((c) => c.id === id);
+    if (!cliente) return;
 
     const idInput = document.getElementById(
-      "editProveedorId"
+      "editClienteId"
     ) as HTMLInputElement;
     const nombreInput = document.getElementById(
-      "editProveedorNombre"
+      "editClienteNombre"
     ) as HTMLInputElement;
     const telefonoInput = document.getElementById(
-      "editProveedorTelefono"
+      "editClienteTelefono"
+    ) as HTMLInputElement;
+    const direccionInput = document.getElementById(
+      "editClienteDireccion"
     ) as HTMLInputElement;
     const modalEditar = document.getElementById("modalEditar");
 
-    if (idInput && nombreInput && telefonoInput && modalEditar) {
-      idInput.value = proveedor.id.toString();
-      nombreInput.value = proveedor.nombre;
-      telefonoInput.value = proveedor.telefono;
+    if (
+      idInput &&
+      nombreInput &&
+      telefonoInput &&
+      direccionInput &&
+      modalEditar
+    ) {
+      idInput.value = cliente.id.toString();
+      nombreInput.value = cliente.nombre;
+      telefonoInput.value = cliente.telefono;
+      direccionInput.value = cliente.direccion;
       modalEditar.classList.remove("hidden");
     }
   }
 
   // Función para confirmar eliminación
-  function confirmarEliminarProveedor(id: number) {
-    console.log(id);
-    if (confirm("¿Estás seguro de que deseas eliminar este proveedor?")) {
-      eliminarProveedor(id);
+  function confirmarEliminarCliente(id: number) {
+    if (confirm("¿Estás seguro de que deseas eliminar este cliente?")) {
+      eliminarCliente(id);
     }
   }
 
-  // Función para eliminar proveedor
-  async function eliminarProveedor(id: number) {
+  // Función para eliminar cliente
+  async function eliminarCliente(id: number) {
     try {
-      const response = await fetch(
-        `http://localhost:5183/api/Proveedores/${id}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const response = await fetch(`http://localhost:5183/api/Clientes/${id}`, {
+        method: "DELETE",
+      });
 
       if (response.ok) {
-        alert("Proveedor eliminado correctamente");
-        await cargarProveedores();
+        alert("Cliente eliminado correctamente");
+        await cargarClientes();
       } else {
-        alert("Error al eliminar el proveedor");
+        alert("Error al eliminar el cliente");
       }
     } catch (error) {
       console.error("Error:", error);
-      alert("Error al eliminar el proveedor");
+      alert("Error al eliminar el cliente");
     }
   }
 
   // Eventos del DOM
   document.addEventListener("DOMContentLoaded", () => {
-    // Cargar proveedores al inicio
-    cargarProveedores();
-    buscarProveedores();
+    // Cargar clientes al inicio
+    cargarClientes();
+    buscarClientes();
 
     // Modal agregar
     const modalAgregar = document.getElementById("modalAgregar");
-    const btnAgregar = document.getElementById("agregarProveedor");
+    const btnAgregar = document.getElementById("agregarCliente");
     const btnCancelar = document.getElementById("cancelarModal");
     const btnCancelarEditar = document.getElementById("cancelarModalEditar");
 
@@ -423,7 +481,7 @@ if (response.ok) {
 
     // Formulario agregar
     const formAgregar = document.getElementById(
-      "formAgregarProveedor"
+      "formAgregarCliente"
     ) as HTMLFormElement;
     if (formAgregar) {
       formAgregar.addEventListener("submit", async (e) => {
@@ -431,38 +489,37 @@ if (response.ok) {
         const formData = new FormData(formAgregar);
 
         try {
-          const response = await fetch(
-            "http://localhost:5183/api/Proveedores",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                nombre: formData.get("nombre") as string,
-                telefono: formData.get("telefono") as string,
-              }),
-            }
-          );
+          const response = await fetch("http://localhost:5183/api/Clientes", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              id: parseInt(formData.get("id") as string),
+              nombre: formData.get("nombre") as string,
+              telefono: formData.get("telefono") as string,
+              direccion: formData.get("direccion") as string,
+            }),
+          });
 
           if (response.ok) {
-            alert("Proveedor agregado correctamente");
+            alert("Cliente agregado correctamente");
             formAgregar.reset();
             if (modalAgregar) modalAgregar.classList.add("hidden");
-            await cargarProveedores();
+            await cargarClientes();
           } else {
-            alert("Error al agregar el proveedor");
+            alert("Error al agregar el cliente");
           }
         } catch (error) {
           console.error("Error:", error);
-          alert("Error al agregar el proveedor");
+          alert("Error al agregar el cliente");
         }
       });
     }
 
     // Formulario editar
     const formEditar = document.getElementById(
-      "formEditarProveedor"
+      "formEditarCliente"
     ) as HTMLFormElement;
     if (formEditar) {
       formEditar.addEventListener("submit", async (e) => {
@@ -472,7 +529,7 @@ if (response.ok) {
 
         try {
           const response = await fetch(
-            `http://localhost:5183/api/Proveedores/${id}`,
+            `http://localhost:5183/api/Clientes/${id}`,
             {
               method: "PUT",
               headers: {
@@ -482,37 +539,38 @@ if (response.ok) {
                 id: parseInt(id as string),
                 nombre: formData.get("nombre") as string,
                 telefono: formData.get("telefono") as string,
+                direccion: formData.get("direccion") as string,
               }),
             }
           );
 
           if (response.ok) {
-            alert("Proveedor actualizado correctamente");
+            alert("Cliente actualizado correctamente");
             if (modalEditar) modalEditar.classList.add("hidden");
-            await cargarProveedores();
+            await cargarClientes();
           } else {
-            alert("Error al actualizar el proveedor");
+            alert("Error al actualizar el cliente");
           }
         } catch (error) {
           console.error("Error:", error);
-          alert("Error al actualizar el proveedor");
+          alert("Error al actualizar el cliente");
         }
       });
     }
 
     // Botones de acción masiva
-    const btnEditar = document.getElementById("editarProveedor");
-    const btnEliminar = document.getElementById("eliminarProveedor");
+    const btnEditar = document.getElementById("editarCliente");
+    const btnEliminar = document.getElementById("eliminarCliente");
 
     if (btnEditar) {
       btnEditar.addEventListener("click", () => {
         const checkbox = document.querySelector(
-          ".proveedorCheckbox:checked"
+          ".clienteCheckbox:checked"
         ) as HTMLInputElement;
         if (checkbox && checkbox.dataset.id) {
-          editarProveedorModal(parseInt(checkbox.dataset.id));
+          editarClienteModal(parseInt(checkbox.dataset.id));
         } else {
-          alert("Seleccione un proveedor para editar");
+          alert("Seleccione un cliente para editar");
         }
       });
     }
@@ -520,12 +578,12 @@ if (response.ok) {
     if (btnEliminar) {
       btnEliminar.addEventListener("click", () => {
         const checkbox = document.querySelector(
-          ".proveedorCheckbox:checked"
+          ".clienteCheckbox:checked"
         ) as HTMLInputElement;
         if (checkbox && checkbox.dataset.id) {
-          confirmarEliminarProveedor(parseInt(checkbox.dataset.id));
+          confirmarEliminarCliente(parseInt(checkbox.dataset.id));
         } else {
-          alert("Seleccione un proveedor para eliminar");
+          alert("Seleccione un cliente para eliminar");
         }
       });
     }

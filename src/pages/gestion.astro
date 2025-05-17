@@ -1,8 +1,12 @@
 ---
+import GestionCliente from "../components/GestionCliente.astro";
+import GestionFacturas from "../components/GestionFacturas.astro";
 import GestionProveedor from "../components/GestionProveedor.astro";
 import GestionUsuario from "../components/GestionUsuario.astro";
 import Sidebar from "../components/UI/Sidebar.astro";
 import LayoutGestion from "../layouts/LayoutGestion.astro";
+import GestionCategoria from "../components/GestionCategoria.astro";
+import GestionArticulo from "../components/GestionArticulo.astro";
 
 const params = Astro.url.searchParams;
 const view = params.get("view");
@@ -14,6 +18,18 @@ switch (view) {
     break;
   case "gestion-proveedores":
     SelectedComponent = GestionProveedor;
+    break;
+  case "gestion-categorias":
+    SelectedComponent = GestionCategoria;
+    break;
+  case "gestion-clientes":
+    SelectedComponent = GestionCliente;
+    break;
+  case "gestion-facturas":
+    SelectedComponent = GestionFacturas;
+    break;
+  case "gestion-articulos":
+    SelectedComponent = GestionArticulo;
     break;
   default:
     SelectedComponent = GestionProveedor;
