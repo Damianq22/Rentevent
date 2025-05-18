@@ -1,19 +1,6 @@
 ---
 import { Icon } from "astro-icon/components";
 
-// Configuración de fetch para desarrollo local
-interface CustomFetchOptions extends RequestInit {
-  agent?: any;
-}
-
-const fetchOptions: CustomFetchOptions = {
-  credentials: "include",
-  mode: "cors",
-  // Solo para desarrollo - NO usar en producción
-  agent: new (await import("https")).Agent({ rejectUnauthorized: false }),
-};
-
-// Tipos para los datos
 interface Articulo {
   id: number;
   descripcion: string;
@@ -37,45 +24,30 @@ interface Categoria {
   descripcion: string;
 }
 
-// Obtener datos iniciales
 let articulos: Articulo[] = [];
 let proveedores: Proveedor[] = [];
 let categorias: Categoria[] = [];
 let error: string | null = null;
 
 try {
-  // Obtener artículos
-  const resArticulos = await fetch(
-    "http://localhost:5183/api/Articulos",
-    fetchOptions
-  );
+  const resArticulos = await fetch("http://localhost:5183/api/Articulos");
   articulos = (await resArticulos.json()) as Articulo[];
 
-  // Obtener proveedores
-  const resProveedores = await fetch(
-    "http://localhost:5183/api/Proveedores",
-    fetchOptions
-  );
+  const resProveedores = await fetch("http://localhost:5183/api/Proveedores");
   proveedores = (await resProveedores.json()) as Proveedor[];
 
-  // Obtener categorías
-  const resCategorias = await fetch(
-    "http://localhost:5183/api/Categorias",
-    fetchOptions
-  );
+  const resCategorias = await fetch("http://localhost:5183/api/Categorias");
   categorias = (await resCategorias.json()) as Categoria[];
 } catch (err) {
   error = (err as Error).message;
   console.error("Error fetching data:", err);
 }
 
-// Función para obtener nombre de proveedor
 const getNombreProveedor = (id: number): string => {
   const proveedor = proveedores.find((p) => p.id === id);
   return proveedor ? proveedor.nombre : "Desconocido";
 };
 
-// Función para obtener descripción de categoría
 const getDescripcionCategoria = (id: number): string => {
   const categoria = categorias.find((c) => c.id === id);
   return categoria ? categoria.descripcion : "Sin categoría";
@@ -84,15 +56,49 @@ const getDescripcionCategoria = (id: number): string => {
 
 <div class="shadow-md sm:rounded-lg bg-[#e9eef6] p-4 pb-2 w-full h-full">
   <!-- Encabezado con botón de agregar -->
-  <div class="flex items-center justify-between mb-4">
-    <h2 class="text-xl font-bold text-gray-800">Gestión de Artículos</h2>
-    <button
-      id="agregarArticulo"
-      class="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-    >
-      <Icon name="add" class="w-5 h-5 mr-2" />
-      Agregar Artículo
-    </button>
+  <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between w-full pb-2">
+      <!-- Botones -->
+      <div class="flex items-center space-x-2">
+        <button
+          id="agregarArticulo"
+          class="flex items-center text-black hover:bg-green-300 p-1 rounded-md border border-gray-300"
+        >
+          <Icon
+            name="add"
+            class="w-6 h-6 mr-2 flex items-center text-[#29b73a96]"
+          />
+          Agregar
+        </button>
+      </div>
+      <!-- Input de búsqueda -->
+      <div class="relative ml-auto">
+        <div
+          class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+        >
+          <svg
+            class="w-4 h-4 text-gray-500 dark:text-gray-400"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 20 20"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"></path>
+          </svg>
+        </div>
+        <input
+          type="text"
+          id="inputSearch"
+          class="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-[#e9eef6] focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          placeholder="Buscar Cliente"
+        />
+      </div>
+    </div>
   </div>
 
   <!-- Mensaje de error -->
@@ -107,7 +113,9 @@ const getDescripcionCategoria = (id: number): string => {
   <!-- Tabla de artículos -->
   <div class="overflow-x-auto">
     <table class="w-full text-sm text-left text-gray-700">
-      <thead class="text-xs text-white uppercase bg-blue-600">
+      <thead
+        class="text-xs text-pink-800 uppercase bg-gray-50 dark:bg-gray-900 dark:text-pink-500"
+      >
         <tr>
           <th scope="col" class="px-6 py-3">ID</th>
           <th scope="col" class="px-6 py-3">Descripción</th>
@@ -118,12 +126,15 @@ const getDescripcionCategoria = (id: number): string => {
           <th scope="col" class="px-6 py-3">Acciones</th>
         </tr>
       </thead>
+
       <tbody>
         {
           articulos.length > 0 ? (
             articulos.map((articulo) => (
-              <tr class="bg-white border-b hover:bg-gray-50">
-                <td class="px-6 py-4">{articulo.id}</td>
+              <tr class="border-b bg-[#e9eef6] dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-400">
+                <td class="px-6 py-4 text-black font-semibold">
+                  {articulo.id}
+                </td>
                 <td class="px-6 py-4 font-medium text-gray-900">
                   {articulo.descripcion}
                 </td>
@@ -142,10 +153,17 @@ const getDescripcionCategoria = (id: number): string => {
                   {getDescripcionCategoria(articulo.categoriaId)}
                 </td>
                 <td class="px-6 py-4 flex space-x-2">
-                  <button class="p-1 text-blue-600 hover:text-blue-800">
+                  <button
+                    class="p-1 text-blue-600 hover:text-blue-800"
+                    data-id={articulo.id}
+                    data-articulo={JSON.stringify(articulo)}
+                  >
                     <Icon name="actualizar" class="w-5 h-5" />
                   </button>
-                  <button class="p-1 text-red-600 hover:text-red-800">
+                  <button
+                    class="p-1 text-red-600 hover:text-red-800"
+                    data-id={articulo.id}
+                  >
                     <Icon name="eliminar" class="w-5 h-5" />
                   </button>
                 </td>
@@ -177,7 +195,7 @@ const getDescripcionCategoria = (id: number): string => {
           id="cancelarModalArticulo"
           class="text-gray-500 hover:text-gray-700"
         >
-          <Icon name="salir" class="w-6 h-6" />
+          <Icon name="back" class="w-6 h-6" />
         </button>
       </div>
 
@@ -292,18 +310,174 @@ const getDescripcionCategoria = (id: number): string => {
 
         <!-- Botones -->
         <div class="flex justify-end space-x-3 pt-4">
-          <button
+          <!-- <button
             type="button"
             id="cancelarModalArticulo"
             class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
           >
             Cancelar
-          </button>
+          </button> -->
           <button
             type="submit"
             class="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
           >
             Guardar Artículo
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal para editar artículo -->
+  <div
+    id="modalEditarArticulo"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-30 backdrop-blur-sm hidden transition-opacity duration-300"
+  >
+    <div
+      class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-2xl border border-gray-200"
+    >
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-2xl font-bold text-gray-800">Editar Artículo</h3>
+        <button
+          id="cancelarModalEditar"
+          class="text-gray-500 hover:text-gray-700"
+        >
+          <Icon name="back" class="w-6 h-6" />
+        </button>
+      </div>
+
+      <form id="formEditarArticulo" class="space-y-4">
+        <input type="hidden" name="id" id="editarArticuloId" />
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Descripción -->
+          <div class="col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Descripción</label
+            >
+            <input
+              type="text"
+              name="descripcion"
+              id="editarDescripcion"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div>
+
+          <!-- Precios -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Precio Alquiler</label
+            >
+            <input
+              type="number"
+              name="precioAlquiler"
+              id="editarPrecioAlquiler"
+              step="0.01"
+              min="0"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Precio Proveedor</label
+            >
+            <input
+              type="number"
+              name="precioProveedor"
+              id="editarPrecioProveedor"
+              step="0.01"
+              min="0"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div>
+
+          <!-- Cantidades -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Cantidad Total</label
+            >
+            <input
+              type="number"
+              name="cantidad"
+              id="editarCantidad"
+              min="0"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >En Reparación</label
+            >
+            <input
+              type="number"
+              name="reparacion"
+              id="editarReparacion"
+              min="0"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div>
+
+          <!-- Selectores -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Proveedor</label
+            >
+            <select
+              name="proveedorId"
+              id="editarProveedorId"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              required
+            >
+              <option value="">Seleccione un proveedor</option>
+              {
+                proveedores.map((proveedor) => (
+                  <option value={proveedor.id}>{proveedor.nombre}</option>
+                ))
+              }
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Categoría</label
+            >
+            <select
+              name="categoriaId"
+              id="editarCategoriaId"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              required
+            >
+              <option value="">Seleccione una categoría</option>
+              {
+                categorias.map((categoria) => (
+                  <option value={categoria.id}>{categoria.descripcion}</option>
+                ))
+              }
+            </select>
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="flex justify-end space-x-3 pt-4">
+          <!-- <button
+            type="button"
+            id="cancelarModalEditar"
+            class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+          >
+            Cancelar
+          </button> -->
+          <button
+            type="submit"
+            class="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+          >
+            Actualizar Artículo
           </button>
         </div>
       </form>
@@ -322,48 +496,184 @@ const getDescripcionCategoria = (id: number): string => {
     categoriaId: string;
   }
 
-  // Manejo del modal
+  interface Articulo {
+    id: number;
+    descripcion: string;
+    precioAlquiler: number;
+    precioProveedor: number;
+    cantidad: number;
+    disponible: number;
+    reparacion: number;
+    proveedorId: number;
+    categoriaId: number;
+  }
+
+  function normalize(text: string | null): string {
+    return text
+      ? text
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+      : "";
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
-    const modal = document.getElementById("modalAgregarArticulo");
+    // Modales
+    const modalAgregar = document.getElementById("modalAgregarArticulo");
+    const modalEditar = document.getElementById("modalEditarArticulo");
     const openBtn = document.getElementById("agregarArticulo");
-    const closeBtn = document.getElementById("cancelarModalArticulo");
-    const form = document.getElementById(
+    const closeBtnAgregar = document.getElementById("cancelarModalArticulo");
+    const closeBtnEditar = document.getElementById("cancelarModalEditar");
+    const formAgregar = document.getElementById(
       "formAgregarArticulo"
     ) as HTMLFormElement;
+    const formEditar = document.getElementById(
+      "formEditarArticulo"
+    ) as HTMLFormElement;
+    const inputSearch = document.getElementById(
+      "inputSearch"
+    ) as HTMLInputElement;
+    const tableBody = document.querySelector("tbody");
 
-    // Abrir modal
+    // Abrir modal de agregar
     openBtn?.addEventListener("click", () => {
-      modal?.classList.remove("hidden");
+      modalAgregar?.classList.remove("hidden");
     });
 
-    // Cerrar modal
-    function closeModal() {
-      modal?.classList.add("hidden");
+    // Funciones para cerrar modales
+    function closeModalAgregar() {
+      modalAgregar?.classList.add("hidden");
     }
 
-    closeBtn?.addEventListener("click", closeModal);
+    function closeModalEditar() {
+      modalEditar?.classList.add("hidden");
+    }
 
-    // Cerrar al hacer clic fuera del modal
-    modal?.addEventListener("click", (e) => {
-      if (e.target === modal) closeModal();
+    closeBtnAgregar?.addEventListener("click", closeModalAgregar);
+    closeBtnEditar?.addEventListener("click", closeModalEditar);
+
+    modalAgregar?.addEventListener("click", (e) => {
+      if (e.target === modalAgregar) closeModalAgregar();
     });
 
-    // Enviar formulario
-    form?.addEventListener("submit", async (e) => {
+    modalEditar?.addEventListener("click", (e) => {
+      if (e.target === modalEditar) closeModalEditar();
+    });
+
+    // Búsqueda en la tabla
+    function searchTable() {
+      const searchTerm = normalize(inputSearch.value);
+      const rows = tableBody?.querySelectorAll("tr") || [];
+
+      rows.forEach((row) => {
+        const descripcion = normalize(row.children[1].textContent);
+        const proveedor = normalize(row.children[4].textContent);
+        const categoria = normalize(row.children[5].textContent);
+
+        const matches =
+          descripcion.includes(searchTerm) ||
+          proveedor.includes(searchTerm) ||
+          categoria.includes(searchTerm);
+
+        row.style.display = matches ? "" : "none";
+      });
+    }
+
+    inputSearch?.addEventListener("input", searchTable);
+
+    // Configurar botones de eliminar
+    function setupDeleteButtons() {
+      const deleteButtons = document.querySelectorAll("button.text-red-600");
+
+      deleteButtons.forEach((button) => {
+        button.addEventListener("click", async function () {
+          const id = this.getAttribute("data-id");
+
+          if (
+            confirm(`¿Está seguro que desea eliminar el artículo con ID ${id}?`)
+          ) {
+            try {
+              const response = await fetch(
+                `http://localhost:5183/api/Articulos/${id}`,
+                {
+                  method: "DELETE",
+                }
+              );
+
+              if (response.ok) {
+                alert("Artículo eliminado correctamente");
+                window.location.reload();
+              } else {
+                throw new Error("Error al eliminar el artículo");
+              }
+            } catch (error) {
+              alert((error as Error).message);
+              console.error("Error:", error);
+            }
+          }
+        });
+      });
+    }
+
+    // Configurar botones de editar
+    function setupUpdateButtons() {
+      const updateButtons = document.querySelectorAll("button.text-blue-600");
+
+      updateButtons.forEach((button) => {
+        button.addEventListener("click", function () {
+          const articuloData = this.getAttribute("data-articulo");
+          if (!articuloData) return;
+
+          const articulo: Articulo = JSON.parse(articuloData);
+
+          (
+            document.getElementById("editarArticuloId") as HTMLInputElement
+          ).value = articulo.id.toString();
+          (
+            document.getElementById("editarDescripcion") as HTMLInputElement
+          ).value = articulo.descripcion;
+          (
+            document.getElementById("editarPrecioAlquiler") as HTMLInputElement
+          ).value = articulo.precioAlquiler.toString();
+          (
+            document.getElementById("editarPrecioProveedor") as HTMLInputElement
+          ).value = articulo.precioProveedor.toString();
+          (
+            document.getElementById("editarCantidad") as HTMLInputElement
+          ).value = articulo.cantidad.toString();
+          (
+            document.getElementById("editarReparacion") as HTMLInputElement
+          ).value = articulo.reparacion.toString();
+          (
+            document.getElementById("editarProveedorId") as HTMLSelectElement
+          ).value = articulo.proveedorId.toString();
+          (
+            document.getElementById("editarCategoriaId") as HTMLSelectElement
+          ).value = articulo.categoriaId.toString();
+
+          modalEditar?.classList.remove("hidden");
+        });
+      });
+    }
+
+    setupDeleteButtons();
+    setupUpdateButtons();
+
+    // Enviar formulario de agregar
+    formAgregar?.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      if (!form) return;
+      if (!formAgregar) return;
 
-      const submitBtn = form.querySelector(
+      const submitBtn = formAgregar.querySelector(
         'button[type="submit"]'
       ) as HTMLButtonElement;
       submitBtn.disabled = true;
       submitBtn.innerHTML = "Guardando...";
 
       try {
-        const formData = new FormData(form);
+        const formData = new FormData(formAgregar);
 
-        // Convertir FormData a objeto tipado
         const formValues = Object.fromEntries(
           formData.entries()
         ) as unknown as ArticuloFormData;
@@ -381,25 +691,19 @@ const getDescripcionCategoria = (id: number): string => {
           categoriaId: parseInt(formValues.categoriaId),
         };
 
-        console.log("articuloData", articuloData);
-
-        const response = await fetch(
-          "https://localhost:7280/api/ArticulosControllerDto",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(articuloData),
-          }
-        );
+        const response = await fetch("http://localhost:5183/api/Articulos", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(articuloData),
+        });
 
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.message || "Error al guardar el artículo");
         }
 
-        // Éxito - recargar página para ver cambios
         alert("Artículo guardado correctamente");
         window.location.reload();
       } catch (error) {
@@ -409,6 +713,71 @@ const getDescripcionCategoria = (id: number): string => {
         if (submitBtn) {
           submitBtn.disabled = false;
           submitBtn.innerHTML = "Guardar Artículo";
+        }
+      }
+    });
+
+    // Enviar formulario de editar
+    formEditar?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      if (!formEditar) return;
+
+      const submitBtn = formEditar.querySelector(
+        'button[type="submit"]'
+      ) as HTMLButtonElement;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = "Actualizando...";
+
+      try {
+        const formData = new FormData(formEditar);
+        const id = formData.get("id") as string;
+
+        const formValues = Object.fromEntries(
+          formData.entries()
+        ) as unknown as ArticuloFormData;
+
+        const articuloData = {
+          id: parseInt(id),
+          descripcion: formValues.descripcion,
+          precioAlquiler: parseFloat(formValues.precioAlquiler),
+          precioProveedor: parseFloat(formValues.precioProveedor),
+          cantidad: parseInt(formValues.cantidad),
+          disponible:
+            parseInt(formValues.cantidad) -
+            (parseInt(formValues.reparacion) || 0),
+          reparacion: parseInt(formValues.reparacion) || 0,
+          proveedorId: parseInt(formValues.proveedorId),
+          categoriaId: parseInt(formValues.categoriaId),
+        };
+
+        const response = await fetch(
+          `http://localhost:5183/api/Articulos/${id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(articuloData),
+          }
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(
+            errorData.message || "Error al actualizar el artículo"
+          );
+        }
+
+        alert("Artículo actualizado correctamente");
+        window.location.reload();
+      } catch (error) {
+        alert((error as Error).message);
+        console.error("Error:", error);
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = "Actualizar Artículo";
         }
       }
     });
