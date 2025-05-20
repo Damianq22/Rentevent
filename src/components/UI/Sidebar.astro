@@ -50,8 +50,9 @@ const isActive = (view) => {
         </li>
         <li>
           <a
-            href="#"
-            class="flex items-center gap-3 h-11 px-4 rounded-lg text-sm font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition"
+            href="/gestion?view=gestion-alquileres"
+            class={`flex items-center gap-3 h-11 px-4 rounded-lg text-sm font-medium transition 
+            ${isActive("gestion-alquileres") ? "bg-green-100 text-green-600 font-semibold" : "text-black hover:bg-gray-100"}`}
           >
             <Icon name="alquiler" class="w-5 h-5 text-indigo-600" />
             Alquileres

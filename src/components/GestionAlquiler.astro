@@ -1,0 +1,724 @@
+---
+import { Icon } from "astro-icon/components";
+
+let alquileres = [];
+let clientesParaModal = [];
+let categoriasParaModal = [];
+let articulosParaModal = [];
+
+try {
+  const response = await fetch("http://localhost:5183/api/Alquileres");
+  if (response.ok) {
+    alquileres = await response.json();
+  } else {
+    console.error("Error al cargar alquileres:", await response.text());
+  }
+} catch (err) {
+  console.error("Error al parsear alquileres:", err);
+}
+
+const formatDate = (dateString) => {
+  if (!dateString) return "N/A";
+  // Asegúrate de que la fecha se interprete correctamente, ajusta si es necesario.
+  // Si dateString ya es una fecha UTC completa, esto está bien.
+  // Si es solo YYYY-MM-DD, new Date() puede interpretarlo como UTC o local dependiendo del navegador.
+  // Para consistencia, podrías añadir T00:00:00Z si es solo fecha.
+  return new Date(dateString).toLocaleDateString("es-ES", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: "UTC", // Añadido para consistencia si las fechas son UTC
+  });
+};
+---
+
+<div class="shadow-md sm:rounded-lg bg-[#e9eef6] p-4 pb-2 w-full h-full">
+  <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between w-full pb-2">
+      <div class="flex items-center space-x-2">
+        <button
+          id="btnAbrirModalAgregar"
+          class="flex items-center text-black hover:bg-green-300 p-1 rounded-md border border-gray-300"
+        >
+          <Icon
+            name="add"
+            class="w-6 h-6 mr-2 flex items-center text-[#29b73a96]"
+          />
+          Agregar Alquiler
+        </button>
+      </div>
+
+      <div class="relative ml-auto">
+        <div
+          class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+        >
+          <svg
+            class="w-4 h-4 text-gray-500 dark:text-gray-400"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 20 20"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"></path>
+          </svg>
+        </div>
+        <input
+          type="text"
+          id="inputSearch"
+          class="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-[#e9eef6] focus:ring-blue-500 focus:border-blue-500"
+          placeholder="Buscar..."
+        />
+      </div>
+    </div>
+  </div>
+
+  {
+    alquileres.length === 0 ? (
+      <p class="text-center text-gray-600">No se encontraron alquileres.</p>
+    ) : (
+      <div class="overflow-x-auto">
+        <table
+          id="tablaAlquileres"
+          class="w-full text-sm text-left text-gray-700"
+        >
+          <thead class="text-xs text-pink-800 uppercase bg-gray-50 dark:bg-gray-900 dark:text-pink-500">
+            <tr>
+              <th class="px-6 py-3">ID Alquiler</th>
+              <th class="px-6 py-3">Cliente</th>
+              <th class="px-6 py-3">Teléfono</th>
+              <th class="px-6 py-3">Dirección</th>
+              <th class="px-6 py-3">Fecha Entrega</th>
+              <th class="px-6 py-3">Fecha Devolución</th>
+              <th class="px-6 py-3">Total</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            {alquileres.map((alquiler) => (
+              <tr class="border-b bg-[#e9eef6] dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-400">
+                <td class="px-6 py-4 text-black font-semibold">
+                  {alquiler.id}
+                </td>
+                <td class="px-6 py-4 text-black">
+                  {alquiler.cliente?.nombre || "N/A"}
+                </td>
+                <td class="px-6 py-4 text-black">
+                  {alquiler.cliente?.telefono || "N/A"}
+                </td>
+                <td class="px-6 py-4 text-black">
+                  {alquiler.cliente?.direccion || "N/A"}
+                </td>
+                <td class="px-6 py-4 text-black">
+                  {formatDate(alquiler.fechaEntrega)}
+                </td>
+                <td class="px-6 py-4 text-black">
+                  {formatDate(alquiler.fechaDevolucion)}
+                </td>
+                <td class="px-6 py-4 text-black">
+                  ${(alquiler.totalPago || 0).toFixed(2)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )
+  }
+</div>
+
+<div
+  id="modalAgregarAlquiler"
+  class="fixed inset-0 backdrop-blur-sm overflow-y-auto h-full w-full hidden flex items-center justify-center z-50"
+>
+  <div
+    class="relative mx-auto p-6 w-full max-w-3xl shadow-lg rounded-md border border-gray-800 bg-white"
+  >
+    <div class="flex justify-between items-center pb-3">
+      <p class="text-2xl font-bold text-gray-700">Agregar Nuevo Alquiler</p>
+      <button id="btnCerrarModal" class="modal-close cursor-pointer z-50 p-2">
+        <svg
+          class="fill-current text-black hover:text-gray-700"
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 18 18"
+        >
+          <path
+            d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"
+          ></path>
+        </svg>
+      </button>
+    </div>
+
+    <form id="formAgregarAlquiler" class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label
+            for="modalFechaEntrega"
+            class="block text-sm font-medium text-gray-700"
+            >Fecha de Entrega</label
+          >
+          <input
+            type="date"
+            id="modalFechaEntrega"
+            name="fechaEntrega"
+            class="mt-1 block w-full p-2 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            required
+          />
+        </div>
+        <div>
+          <label
+            for="modalFechaDevolucion"
+            class="block text-sm font-medium text-gray-700"
+            >Fecha de Devolución</label
+          >
+          <input
+            type="date"
+            id="modalFechaDevolucion"
+            name="fechaDevolucion"
+            class="mt-1 block w-full p-2 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            required
+          />
+        </div>
+      </div>
+
+      <div>
+        <label
+          for="modalCliente"
+          class="block text-sm font-medium text-gray-700">Cliente</label
+        >
+        <select
+          id="modalCliente"
+          name="clienteId"
+          class="mt-1 block w-full p-2 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          required
+        >
+          <option value="">Cargando clientes...</option>
+        </select>
+      </div>
+
+      <hr class="my-6" />
+      <h3 class="text-lg font-semibold text-gray-800">Detalles de Artículos</h3>
+
+      <div id="contenedorArticulosModal" class="space-y-4"></div>
+
+      <button
+        type="button"
+        id="btnAgregarOtroArticulo"
+        class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+        >+ Agregar otro artículo</button
+      >
+
+      <div class="mt-6 text-right">
+        <p class="text-xl font-semibold text-gray-800">
+          Total Alquiler: <span id="modalTotalPagoDisplay">$0.00</span>
+        </p>
+      </div>
+
+      <div class="pt-4 flex justify-end space-x-3">
+        <button
+          type="button"
+          id="btnCancelarModal"
+          class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+          >Cancelar</button
+        >
+        <button
+          type="submit"
+          id="btnGuardarAlquiler"
+          class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+          >Guardar Alquiler</button
+        >
+      </div>
+    </form>
+  </div>
+</div>
+
+<script is:inline>
+  function normalize(text) {
+    return (
+      text
+        ?.toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "") || ""
+    );
+  }
+
+  function searchTable() {
+    const inputSearch = document.getElementById("inputSearch");
+    const searchTerm = normalize(inputSearch.value);
+    const tableBody = document.getElementById("tableBody");
+    const rows = tableBody?.querySelectorAll("tr") || [];
+
+    rows.forEach((row) => {
+      const cliente = normalize(row.children[1]?.textContent);
+      const telefono = normalize(row.children[2]?.textContent);
+      const direccion = normalize(row.children[3]?.textContent);
+      const fechaEntrega = normalize(row.children[4]?.textContent);
+      const fechaDevolucion = normalize(row.children[5]?.textContent);
+      const total = normalize(row.children[6]?.textContent);
+      const idAlquiler = normalize(row.children[0]?.textContent);
+
+      const matches =
+        idAlquiler.includes(searchTerm) ||
+        cliente.includes(searchTerm) ||
+        telefono.includes(searchTerm) ||
+        direccion.includes(searchTerm) ||
+        fechaEntrega.includes(searchTerm) ||
+        fechaDevolucion.includes(searchTerm) ||
+        total.includes(searchTerm);
+
+      row.style.display = matches ? "" : "none";
+    });
+  }
+
+  function getUserIdFromCookie() {
+    const cookies = document.cookie.split(";");
+    for (let cookie of cookies) {
+      const [name, value] = cookie.split("=").map((c) => c.trim());
+      if (name === "jwt") {
+        try {
+          const payloadBase64 = value.split(".")[1];
+          if (!payloadBase64) return 1;
+          const payload = JSON.parse(atob(payloadBase64));
+          return payload.userId || payload.id || 1;
+        } catch (e) {
+          console.error("Error al decodificar JWT o extraer userId:", e);
+          return 1;
+        }
+      }
+    }
+    console.warn(
+      "Cookie 'jwt' no encontrada. Usando ID de usuario fallback: 1"
+    );
+    return 1;
+  }
+
+  const API_BASE_URL = "http://localhost:5183/api";
+  let allArticulosData = [];
+  let allCategoriasData = [];
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const modal = document.getElementById("modalAgregarAlquiler");
+    const btnAbrirModal = document.getElementById("btnAbrirModalAgregar");
+    const btnCerrarModal = document.getElementById("btnCerrarModal");
+    const btnCancelarModal = document.getElementById("btnCancelarModal");
+    const formAgregarAlquiler = document.getElementById("formAgregarAlquiler");
+    const inputSearch = document.getElementById("inputSearch");
+    const btnAgregarOtroArticulo = document.getElementById(
+      "btnAgregarOtroArticulo"
+    );
+    const contenedorArticulosModal = document.getElementById(
+      "contenedorArticulosModal"
+    );
+    const modalTotalPagoDisplay = document.getElementById(
+      "modalTotalPagoDisplay"
+    );
+
+    if (inputSearch) {
+      inputSearch.addEventListener("input", searchTable);
+    }
+
+    // Abrir Modal
+    if (btnAbrirModal) {
+      btnAbrirModal.addEventListener("click", async () => {
+        modal.classList.remove("hidden");
+        document.body.classList.add("overflow-hidden");
+        await loadModalInitialData();
+        resetAndAddFirstArticuloRow();
+      });
+    }
+
+    // Cerrar Modal
+    function closeModal() {
+      modal.classList.add("hidden");
+      document.body.classList.remove("overflow-hidden");
+      formAgregarAlquiler.reset();
+      contenedorArticulosModal.innerHTML = "";
+      modalTotalPagoDisplay.textContent = "$0.00";
+      document.getElementById("modalCliente").innerHTML =
+        '<option value="">Cargando clientes...</option>';
+    }
+    if (btnCerrarModal) btnCerrarModal.addEventListener("click", closeModal);
+    if (btnCancelarModal)
+      btnCancelarModal.addEventListener("click", closeModal);
+
+    async function loadModalInitialData() {
+      const clienteSelect = document.getElementById("modalCliente");
+
+      try {
+        const resClientes = await fetch(`${API_BASE_URL}/Clientes`);
+        if (!resClientes.ok) throw new Error("Error al cargar clientes");
+        const clientes = await resClientes.json();
+        clienteSelect.innerHTML =
+          '<option value="">Seleccione un cliente</option>';
+        clientes.forEach((cli) => {
+          clienteSelect.innerHTML += `<option value="${cli.id}">${cli.nombre}</option>`;
+        });
+      } catch (error) {
+        console.error(error);
+        clienteSelect.innerHTML =
+          '<option value="">Error al cargar clientes</option>';
+      }
+
+      if (allCategoriasData.length === 0) {
+        try {
+          const resCategorias = await fetch(`${API_BASE_URL}/Categorias`);
+          if (!resCategorias.ok) throw new Error("Error al cargar categorías");
+          allCategoriasData = await resCategorias.json();
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      if (allArticulosData.length === 0) {
+        try {
+          const resArticulos = await fetch(`${API_BASE_URL}/Articulos`);
+          if (!resArticulos.ok) throw new Error("Error al cargar artículos");
+          allArticulosData = await resArticulos.json();
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    }
+
+    let articuloRowIndex = 0;
+    function addArticuloRow() {
+      articuloRowIndex++;
+      const div = document.createElement("div");
+      div.className = "articulo-row p-3 border rounded-md space-y-2 bg-gray-50";
+      div.dataset.rowIndex = articuloRowIndex;
+
+      div.innerHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+                <div>
+                    <label for="modalCategoria-${articuloRowIndex}" class="block text-xs font-medium text-gray-600">Categoría</label>
+                    <select id="modalCategoria-${articuloRowIndex}" name="categoria" class="modal-categoria-select mt-1 block w-full p-2 text-sm border-gray-300 rounded-md shadow-sm" required>
+                        <option value="">Seleccione...</option>
+                        ${allCategoriasData.map((cat) => `<option value="${cat.id}">${cat.descripcion}</option>`).join("")}
+                    </select>
+                </div>
+                <div>
+                    <label for="modalArticulo-${articuloRowIndex}" class="block text-xs font-medium text-gray-600">Artículo (Disponibles)</label>
+                    <select id="modalArticulo-${articuloRowIndex}" name="articuloId" class="modal-articulo-select mt-1 block w-full p-2 text-sm border-gray-300 rounded-md shadow-sm" required disabled>
+                        <option value="">Seleccione categoría primero...</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="modalCantidad-${articuloRowIndex}" class="block text-xs font-medium text-gray-600">Cantidad</label>
+                    <input type="number" id="modalCantidad-${articuloRowIndex}" name="cantidad" min="1" class="modal-cantidad-input mt-1 block w-full p-2 text-sm border-gray-300 rounded-md shadow-sm" required disabled placeholder="0" />
+                </div>
+                <button type="button" class="btnEliminarArticuloRow bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600 self-center h-9">Eliminar</button>
+            </div>
+            <p class="text-xs text-gray-500">Costo Alquiler Artículo: <span id="costoArticuloDisplay-${articuloRowIndex}">$0.00</span> | Subtotal: <span id="subtotalArticuloDisplay-${articuloRowIndex}">$0.00</span></p>
+        `;
+      contenedorArticulosModal.appendChild(div);
+      attachArticuloRowListeners(div);
+    }
+
+    function resetAndAddFirstArticuloRow() {
+      contenedorArticulosModal.innerHTML = "";
+      articuloRowIndex = 0;
+      addArticuloRow();
+    }
+
+    function attachArticuloRowListeners(rowElement) {
+      const categoriaSelect = rowElement.querySelector(
+        ".modal-categoria-select"
+      );
+      const articuloSelect = rowElement.querySelector(".modal-articulo-select");
+      const cantidadInput = rowElement.querySelector(".modal-cantidad-input");
+      const btnEliminar = rowElement.querySelector(".btnEliminarArticuloRow");
+      const rowIndex = rowElement.dataset.rowIndex;
+      const costoArticuloDisplay = document.getElementById(
+        `costoArticuloDisplay-${rowIndex}`
+      );
+      const subtotalArticuloDisplay = document.getElementById(
+        `subtotalArticuloDisplay-${rowIndex}`
+      );
+
+      categoriaSelect.addEventListener("change", function () {
+        const categoriaId = parseInt(this.value);
+        articuloSelect.innerHTML =
+          '<option value="">Cargando artículos...</option>';
+        articuloSelect.disabled = true;
+        cantidadInput.disabled = true;
+        cantidadInput.value = "";
+        cantidadInput.max = "";
+        costoArticuloDisplay.textContent = "$0.00";
+        subtotalArticuloDisplay.textContent = "$0.00";
+
+        if (!categoriaId) {
+          articuloSelect.innerHTML =
+            '<option value="">Seleccione categoría primero...</option>';
+          updateTotalAlquiler();
+          return;
+        }
+
+        const articulosFiltrados = allArticulosData.filter(
+          (art) => art.categoriaId === categoriaId
+        );
+        if (articulosFiltrados.length > 0) {
+          articuloSelect.innerHTML =
+            '<option value="">Seleccione un artículo...</option>';
+          articulosFiltrados.forEach((art) => {
+            articuloSelect.innerHTML += `<option value="${art.id}" data-precio="${art.precioAlquiler}" data-disponible="${art.disponible}" data-nombre="${art.descripcion}">${art.descripcion} (Disp: ${art.disponible})</option>`;
+          });
+          articuloSelect.disabled = false;
+        } else {
+          articuloSelect.innerHTML =
+            '<option value="">No hay artículos</option>';
+        }
+        updateTotalAlquiler();
+      });
+
+      articuloSelect.addEventListener("change", function () {
+        const selectedOption = this.options[this.selectedIndex];
+        cantidadInput.value = "";
+        subtotalArticuloDisplay.textContent = "$0.00";
+        if (this.value && selectedOption.dataset.precio) {
+          cantidadInput.disabled = false;
+          cantidadInput.max = selectedOption.dataset.disponible;
+          costoArticuloDisplay.textContent = `$${parseFloat(selectedOption.dataset.precio).toFixed(2)}`;
+        } else {
+          cantidadInput.disabled = true;
+          costoArticuloDisplay.textContent = "$0.00";
+        }
+        updateTotalAlquiler();
+      });
+
+      cantidadInput.addEventListener("input", function () {
+        const cantidad = parseInt(this.value) || 0;
+        const maxDisponible = parseInt(this.max) || 0;
+        const selectedArticuloOption =
+          articuloSelect.options[articuloSelect.selectedIndex];
+        const precioUnitario =
+          selectedArticuloOption && selectedArticuloOption.dataset.precio
+            ? parseFloat(selectedArticuloOption.dataset.precio)
+            : 0;
+
+        if (cantidad > maxDisponible) {
+          this.value = maxDisponible;
+          console.warn(`Cantidad excede disponible (${maxDisponible})`);
+        }
+        const cantidadValida = Math.min(cantidad, maxDisponible);
+        subtotalArticuloDisplay.textContent = `$${(cantidadValida * precioUnitario).toFixed(2)}`;
+        updateTotalAlquiler();
+      });
+
+      btnEliminar.addEventListener("click", function () {
+        rowElement.remove();
+        updateTotalAlquiler();
+      });
+    }
+
+    if (btnAgregarOtroArticulo) {
+      btnAgregarOtroArticulo.addEventListener("click", addArticuloRow);
+    }
+
+    function updateTotalAlquiler() {
+      let totalGeneral = 0;
+      const articuloRows =
+        contenedorArticulosModal.querySelectorAll(".articulo-row");
+      articuloRows.forEach((row) => {
+        const cantidadInput = row.querySelector(".modal-cantidad-input");
+        const articuloSelect = row.querySelector(".modal-articulo-select");
+        const selectedArticuloOption =
+          articuloSelect.options[articuloSelect.selectedIndex];
+
+        if (
+          cantidadInput &&
+          selectedArticuloOption &&
+          selectedArticuloOption.value
+        ) {
+          const cantidad = parseInt(cantidadInput.value) || 0;
+          const precio = parseFloat(selectedArticuloOption.dataset.precio) || 0;
+          totalGeneral += cantidad * precio;
+        }
+      });
+      modalTotalPagoDisplay.textContent = `$${totalGeneral.toFixed(2)}`;
+    }
+
+    if (formAgregarAlquiler) {
+      formAgregarAlquiler.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        const btnGuardar = document.getElementById("btnGuardarAlquiler");
+        btnGuardar.disabled = true;
+        btnGuardar.textContent = "Guardando...";
+
+        const formData = new FormData(this);
+        const clienteId = parseInt(formData.get("clienteId"));
+        const fechaEntrega = formData.get("fechaEntrega");
+        const fechaDevolucion = formData.get("fechaDevolucion");
+
+        if (new Date(fechaDevolucion) < new Date(fechaEntrega)) {
+          alert(
+            "La fecha de devolución no puede ser anterior a la fecha de entrega."
+          );
+          btnGuardar.disabled = false;
+          btnGuardar.textContent = "Guardar Alquiler";
+          return;
+        }
+
+        // Recolectar detalles de artículos
+        const detallesArticulos = [];
+        const articuloRows =
+          contenedorArticulosModal.querySelectorAll(".articulo-row");
+        let hayArticulosInvalidos = false;
+
+        articuloRows.forEach((row) => {
+          const articuloSelect = row.querySelector(".modal-articulo-select");
+          const cantidadInput = row.querySelector(".modal-cantidad-input");
+          const articuloId = parseInt(articuloSelect.value);
+          const cantidad = parseInt(cantidadInput.value);
+          const selectedOption =
+            articuloSelect.options[articuloSelect.selectedIndex];
+          const disponible = selectedOption
+            ? parseInt(selectedOption.dataset.disponible)
+            : 0;
+
+          if (articuloId && cantidad > 0) {
+            if (cantidad > disponible) {
+              alert(
+                `Cantidad para "${selectedOption.dataset.nombre}" (${cantidad}) excede lo disponible (${disponible}).`
+              );
+              hayArticulosInvalidos = true;
+              return;
+            }
+            detallesArticulos.push({ articuloId, cantidad });
+          }
+        });
+
+        if (hayArticulosInvalidos) {
+          btnGuardar.disabled = false;
+          btnGuardar.textContent = "Guardar Alquiler";
+          return;
+        }
+
+        if (detallesArticulos.length === 0) {
+          alert("Debe agregar al menos un artículo al alquiler.");
+          btnGuardar.disabled = false;
+          btnGuardar.textContent = "Guardar Alquiler";
+          return;
+        }
+
+        const totalPago = parseFloat(
+          modalTotalPagoDisplay.textContent.replace("$", "")
+        );
+        const usuarioId = getUserIdFromCookie();
+
+        let nuevoAlquilerId = 1;
+        try {
+          const resAlquileres = await fetch(`${API_BASE_URL}/Alquileres`);
+          if (resAlquileres.ok) {
+            const alquileresActuales = await resAlquileres.json();
+            if (alquileresActuales.length > 0) {
+              const maxId = Math.max(
+                ...alquileresActuales
+                  .map((a) => Number(a.id))
+                  .filter((id) => !isNaN(id))
+              );
+              if (isFinite(maxId)) {
+                nuevoAlquilerId = maxId + 1;
+              } else {
+                console.warn(
+                  "No se pudo determinar el último ID de alquiler, se usará 1 o el ID generado por el backend."
+                );
+              }
+            }
+          } else {
+            console.warn(
+              "No se pudieron obtener los alquileres para determinar el nuevo ID. El backend debería generar el ID."
+            );
+          }
+        } catch (error) {
+          console.error("Error obteniendo alquileres para ID:", error);
+        }
+
+        const datosAlquiler = {
+          id: 0,
+          FechaEntrega: new Date(fechaEntrega + "T00:00:00").toISOString(),
+          FechaDevolucion: new Date(
+            fechaDevolucion + "T00:00:00"
+          ).toISOString(),
+          TotalPago: totalPago,
+          Estado: "Pendiente",
+          ClienteId: clienteId,
+          UsuarioId: usuarioId,
+        };
+
+        console.log("Nuevo ID de alquiler:", datosAlquiler);
+
+        try {
+          const resNuevoAlquiler = await fetch(`${API_BASE_URL}/AlquilerAdd`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datosAlquiler),
+          });
+
+          if (!resNuevoAlquiler.ok) {
+            const errorData = await resNuevoAlquiler.text();
+            throw new Error(
+              `Error al guardar alquiler: ${resNuevoAlquiler.status} - ${errorData}`
+            );
+          }
+          const alquilerGuardado = await resNuevoAlquiler.json();
+          const alquilerIdReal = alquilerGuardado.id;
+
+          for (const detalle of detallesArticulos) {
+            const datosDetalle = {
+              articuloId: detalle.articuloId,
+              cantidad: detalle.cantidad,
+              alquilerId: alquilerIdReal,
+            };
+            const resDetalle = await fetch(`${API_BASE_URL}/DetalleAlquiler`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(datosDetalle),
+            });
+            if (!resDetalle.ok) {
+              const errorDetalle = await resDetalle.text();
+              console.error(
+                `Error al guardar detalle para artículo ${detalle.articuloId}: ${errorDetalle}`
+              );
+            }
+          }
+
+          alert("Alquiler agregado exitosamente!");
+          closeModal();
+          location.reload();
+        } catch (error) {
+          console.error("Error en el proceso de guardado:", error);
+          alert(`Ocurrió un error: ${error.message}`);
+        } finally {
+          btnGuardar.disabled = false;
+          btnGuardar.textContent = "Guardar Alquiler";
+        }
+      });
+    }
+  });
+</script>
+
+<style>
+  table {
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  th,
+  td {
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  #modalAgregarAlquiler > div {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+</style>

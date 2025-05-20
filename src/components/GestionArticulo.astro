@@ -184,10 +184,10 @@ const getDescripcionCategoria = (id: number): string => {
   <!-- Modal para agregar artículo -->
   <div
     id="modalAgregarArticulo"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-30 backdrop-blur-sm hidden transition-opacity duration-300"
+    class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm hidden transition-opacity duration-300"
   >
     <div
-      class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-2xl border border-gray-200"
+      class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-2xl border border-gray-800"
     >
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-2xl font-bold text-gray-800">Agregar Nuevo Artículo</h3>
@@ -331,10 +331,10 @@ const getDescripcionCategoria = (id: number): string => {
   <!-- Modal para editar artículo -->
   <div
     id="modalEditarArticulo"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-30 backdrop-blur-sm hidden transition-opacity duration-300"
+    class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm backdrop-blur-sm hidden transition-opacity duration-300"
   >
     <div
-      class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-2xl border border-gray-200"
+      class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-2xl border border-gray-800"
     >
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-2xl font-bold text-gray-800">Editar Artículo</h3>
@@ -518,7 +518,6 @@ const getDescripcionCategoria = (id: number): string => {
   }
 
   document.addEventListener("DOMContentLoaded", function () {
-    // Modales
     const modalAgregar = document.getElementById("modalAgregarArticulo");
     const modalEditar = document.getElementById("modalEditarArticulo");
     const openBtn = document.getElementById("agregarArticulo");
@@ -690,6 +689,8 @@ const getDescripcionCategoria = (id: number): string => {
           proveedorId: parseInt(formValues.proveedorId),
           categoriaId: parseInt(formValues.categoriaId),
         };
+
+        console.log("aquiii Articulo Data:", articuloData);
 
         const response = await fetch("http://localhost:5183/api/Articulos", {
           method: "POST",
