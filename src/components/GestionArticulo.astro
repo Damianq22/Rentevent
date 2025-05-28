@@ -120,667 +120,699 @@ const getDescripcionCategoria = (id: number): string => {
           <th scope="col" class="px-6 py-3">ID</th>
           <th scope="col" class="px-6 py-3">Descripción</th>
           <th scope="col" class="px-6 py-3">Precio Alquiler</th>
+          <th scope="col" class="px-6 py-3">Total</th>
           <th scope="col" class="px-6 py-3">Disponible</th>
+          <th scope="col" class="px-6 py-3">Reparación</th>
           <th scope="col" class="px-6 py-3">Proveedor</th>
           <th scope="col" class="px-6 py-3">Categoría</th>
           <th scope="col" class="px-6 py-3">Acciones</th>
         </tr>
-      </thead>
 
-      <tbody>
-        {
-          articulos.length > 0 ? (
-            articulos.map((articulo) => (
-              <tr class="border-b bg-[#e9eef6] dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-400">
-                <td class="px-6 py-4 text-black font-semibold">
-                  {articulo.id}
-                </td>
-                <td class="px-6 py-4 font-medium text-gray-900">
-                  {articulo.descripcion}
-                </td>
-                <td class="px-6 py-4">${articulo.precioAlquiler.toFixed(2)}</td>
-                <td class="px-6 py-4">
-                  <span
-                    class={`px-2 py-1 rounded-full text-xs ${articulo.disponible > 0 ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
-                  >
-                    {articulo.disponible} disponibles
-                  </span>
-                </td>
-                <td class="px-6 py-4">
-                  {getNombreProveedor(articulo.proveedorId)}
-                </td>
-                <td class="px-6 py-4">
-                  {getDescripcionCategoria(articulo.categoriaId)}
-                </td>
-                <td class="px-6 py-4 flex space-x-2">
-                  <button
-                    class="p-1 text-blue-600 hover:text-blue-800"
-                    data-id={articulo.id}
-                    data-articulo={JSON.stringify(articulo)}
-                  >
-                    <Icon name="actualizar" class="w-5 h-5" />
-                  </button>
-                  <button
-                    class="p-1 text-red-600 hover:text-red-800"
-                    data-id={articulo.id}
-                  >
-                    <Icon name="eliminar" class="w-5 h-5" />
-                  </button>
+        <tbody>
+          {
+            articulos.length > 0 ? (
+              articulos.map((articulo) => (
+                <tr class="border-b bg-[#e9eef6] dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-400">
+                  <td class="px-6 py-4 text-black font-semibold">
+                    {articulo.id}
+                  </td>
+                  <td class="px-6 py-4 font-medium text-gray-900">
+                    {articulo.descripcion}
+                  </td>
+                  <td class="px-6 py-4">
+                    ${articulo.precioAlquiler.toFixed(2)}
+                  </td>
+                  <td class="px-6 py-4">
+                    <span
+                      class={`px-2 py-1 rounded-full text-xs ${articulo.disponible > 0 ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
+                    >
+                      {articulo.cantidad}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4">
+                    <span
+                      class={`px-2 py-1 rounded-full text-xs ${articulo.disponible > 0 ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
+                    >
+                      {articulo.disponible} disponibles
+                    </span>
+                  </td>
+                  <td class="px-6 py-4">
+                    <span
+                      class={`px-2 py-1 rounded-full text-xs ${articulo.reparacion >= 0 ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
+                    >
+                      {articulo.reparacion} reparación
+                    </span>
+                  </td>
+                  <td class="px-6 py-4">
+                    {getNombreProveedor(articulo.proveedorId)}
+                  </td>
+                  <td class="px-6 py-4">
+                    {getDescripcionCategoria(articulo.categoriaId)}
+                  </td>
+                  <td class="px-6 py-4 flex space-x-2">
+                    <button
+                      class="p-1 text-blue-600 hover:text-blue-800"
+                      data-id={articulo.id}
+                      data-articulo={JSON.stringify(articulo)}
+                    >
+                      <Icon name="actualizar" class="w-5 h-5" />
+                    </button>
+                    <button
+                      class="p-1 text-red-600 hover:text-red-800"
+                      data-id={articulo.id}
+                    >
+                      <Icon name="eliminar" class="w-5 h-5" />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                  No se encontraron artículos
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colspan="7" class="px-6 py-4 text-center text-gray-500">
-                No se encontraron artículos
-              </td>
-            </tr>
-          )
-        }
-      </tbody>
+            )
+          }
+        </tbody>
+      </thead>
     </table>
-  </div>
 
-  <!-- Modal para agregar artículo -->
-  <div
-    id="modalAgregarArticulo"
-    class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm hidden transition-opacity duration-300"
-  >
+    <!-- Modal para agregar artículo -->
     <div
-      class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-2xl border border-gray-800"
+      id="modalAgregarArticulo"
+      class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm hidden transition-opacity duration-300"
     >
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-2xl font-bold text-gray-800">Agregar Nuevo Artículo</h3>
-        <button
-          id="cancelarModalArticulo"
-          class="text-gray-500 hover:text-gray-700"
-        >
-          <Icon name="back" class="w-6 h-6" />
-        </button>
-      </div>
-
-      <form id="formAgregarArticulo" class="space-y-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Descripción -->
-          <div class="col-span-2">
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Descripción</label
-            >
-            <input
-              type="text"
-              name="descripcion"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required
-            />
-          </div>
-
-          <!-- Precios -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Precio Alquiler</label
-            >
-            <input
-              type="number"
-              name="precioAlquiler"
-              step="0.01"
-              min="0"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required
-            />
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Precio Proveedor</label
-            >
-            <input
-              type="number"
-              name="precioProveedor"
-              step="0.01"
-              min="0"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required
-            />
-          </div>
-
-          <!-- Cantidades -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Cantidad Total</label
-            >
-            <input
-              type="number"
-              name="cantidad"
-              min="0"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required
-            />
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >En Reparación</label
-            >
-            <input
-              type="number"
-              name="reparacion"
-              min="0"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required
-            />
-          </div>
-
-          <!-- Selectores -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Proveedor</label
-            >
-            <select
-              name="proveedorId"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required
-            >
-              <option value="">Seleccione un proveedor</option>
-              {
-                proveedores.map((proveedor) => (
-                  <option value={proveedor.id}>{proveedor.nombre}</option>
-                ))
-              }
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Categoría</label
-            >
-            <select
-              name="categoriaId"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required
-            >
-              <option value="">Seleccione una categoría</option>
-              {
-                categorias.map((categoria) => (
-                  <option value={categoria.id}>{categoria.descripcion}</option>
-                ))
-              }
-            </select>
-          </div>
+      <div
+        class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-2xl border border-gray-800"
+      >
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-2xl font-bold text-gray-800">
+            Agregar Nuevo Artículo
+          </h3>
+          <button
+            id="cancelarModalArticulo"
+            class="text-gray-500 hover:text-gray-700"
+          >
+            <Icon name="back" class="w-6 h-6" />
+          </button>
         </div>
 
-        <!-- Botones -->
-        <div class="flex justify-end space-x-3 pt-4">
-          <!-- <button
+        <form id="formAgregarArticulo" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Descripción -->
+            <div class="col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Descripción</label
+              >
+              <input
+                type="text"
+                name="descripcion"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
+            </div>
+
+            <!-- Precios -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Precio Alquiler</label
+              >
+              <input
+                type="number"
+                name="precioAlquiler"
+                step="0.01"
+                min="0"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Precio Proveedor</label
+              >
+              <input
+                type="number"
+                name="precioProveedor"
+                step="0.01"
+                min="0"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
+            </div>
+
+            <!-- Cantidades -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Cantidad Total</label
+              >
+              <input
+                type="number"
+                name="cantidad"
+                min="0"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >En Reparación</label
+              >
+              <input
+                type="number"
+                name="reparacion"
+                min="0"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
+            </div>
+
+            <!-- Selectores -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Proveedor</label
+              >
+              <select
+                name="proveedorId"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              >
+                <option value="">Seleccione un proveedor</option>
+                {
+                  proveedores.map((proveedor) => (
+                    <option value={proveedor.id}>{proveedor.nombre}</option>
+                  ))
+                }
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Categoría</label
+              >
+              <select
+                name="categoriaId"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              >
+                <option value="">Seleccione una categoría</option>
+                {
+                  categorias.map((categoria) => (
+                    <option value={categoria.id}>
+                      {categoria.descripcion}
+                    </option>
+                  ))
+                }
+              </select>
+            </div>
+          </div>
+
+          <!-- Botones -->
+          <div class="flex justify-end space-x-3 pt-4">
+            <!-- <button
             type="button"
             id="cancelarModalArticulo"
             class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
           >
             Cancelar
           </button> -->
+            <button
+              type="submit"
+              class="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+            >
+              Guardar Artículo
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal para editar artículo -->
+    <div
+      id="modalEditarArticulo"
+      class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm backdrop-blur-sm hidden transition-opacity duration-300"
+    >
+      <div
+        class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-2xl border border-gray-800"
+      >
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-2xl font-bold text-gray-800">Editar Artículo</h3>
           <button
-            type="submit"
-            class="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+            id="cancelarModalEditar"
+            class="text-gray-500 hover:text-gray-700"
           >
-            Guardar Artículo
+            <Icon name="back" class="w-6 h-6" />
           </button>
         </div>
-      </form>
-    </div>
-  </div>
 
-  <!-- Modal para editar artículo -->
-  <div
-    id="modalEditarArticulo"
-    class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm backdrop-blur-sm hidden transition-opacity duration-300"
-  >
-    <div
-      class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-2xl border border-gray-800"
-    >
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-2xl font-bold text-gray-800">Editar Artículo</h3>
-        <button
-          id="cancelarModalEditar"
-          class="text-gray-500 hover:text-gray-700"
-        >
-          <Icon name="back" class="w-6 h-6" />
-        </button>
-      </div>
+        <form id="formEditarArticulo" class="space-y-4">
+          <input type="hidden" name="id" id="editarArticuloId" />
 
-      <form id="formEditarArticulo" class="space-y-4">
-        <input type="hidden" name="id" id="editarArticuloId" />
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Descripción -->
+            <div class="col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Descripción</label
+              >
+              <input
+                type="text"
+                name="descripcion"
+                id="editarDescripcion"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
+            </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Descripción -->
-          <div class="col-span-2">
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Descripción</label
-            >
-            <input
-              type="text"
-              name="descripcion"
-              id="editarDescripcion"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required
-            />
+            <!-- Precios -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Precio Alquiler</label
+              >
+              <input
+                type="number"
+                name="precioAlquiler"
+                id="editarPrecioAlquiler"
+                step="0.01"
+                min="0"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Precio Proveedor</label
+              >
+              <input
+                type="number"
+                name="precioProveedor"
+                id="editarPrecioProveedor"
+                step="0.01"
+                min="0"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
+            </div>
+
+            <!-- Cantidades -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Cantidad Total</label
+              >
+              <input
+                type="number"
+                name="cantidad"
+                id="editarCantidad"
+                min="0"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >En Reparación</label
+              >
+              <input
+                type="number"
+                name="reparacion"
+                id="editarReparacion"
+                min="0"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
+            </div>
+
+            <!-- Selectores -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Proveedor</label
+              >
+              <select
+                name="proveedorId"
+                id="editarProveedorId"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              >
+                <option value="">Seleccione un proveedor</option>
+                {
+                  proveedores.map((proveedor) => (
+                    <option value={proveedor.id}>{proveedor.nombre}</option>
+                  ))
+                }
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Categoría</label
+              >
+              <select
+                name="categoriaId"
+                id="editarCategoriaId"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              >
+                <option value="">Seleccione una categoría</option>
+                {
+                  categorias.map((categoria) => (
+                    <option value={categoria.id}>
+                      {categoria.descripcion}
+                    </option>
+                  ))
+                }
+              </select>
+            </div>
           </div>
 
-          <!-- Precios -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Precio Alquiler</label
-            >
-            <input
-              type="number"
-              name="precioAlquiler"
-              id="editarPrecioAlquiler"
-              step="0.01"
-              min="0"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required
-            />
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Precio Proveedor</label
-            >
-            <input
-              type="number"
-              name="precioProveedor"
-              id="editarPrecioProveedor"
-              step="0.01"
-              min="0"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required
-            />
-          </div>
-
-          <!-- Cantidades -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Cantidad Total</label
-            >
-            <input
-              type="number"
-              name="cantidad"
-              id="editarCantidad"
-              min="0"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required
-            />
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >En Reparación</label
-            >
-            <input
-              type="number"
-              name="reparacion"
-              id="editarReparacion"
-              min="0"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required
-            />
-          </div>
-
-          <!-- Selectores -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Proveedor</label
-            >
-            <select
-              name="proveedorId"
-              id="editarProveedorId"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required
-            >
-              <option value="">Seleccione un proveedor</option>
-              {
-                proveedores.map((proveedor) => (
-                  <option value={proveedor.id}>{proveedor.nombre}</option>
-                ))
-              }
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Categoría</label
-            >
-            <select
-              name="categoriaId"
-              id="editarCategoriaId"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required
-            >
-              <option value="">Seleccione una categoría</option>
-              {
-                categorias.map((categoria) => (
-                  <option value={categoria.id}>{categoria.descripcion}</option>
-                ))
-              }
-            </select>
-          </div>
-        </div>
-
-        <!-- Botones -->
-        <div class="flex justify-end space-x-3 pt-4">
-          <!-- <button
+          <!-- Botones -->
+          <div class="flex justify-end space-x-3 pt-4">
+            <!-- <button
             type="button"
             id="cancelarModalEditar"
             class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
           >
             Cancelar
           </button> -->
-          <button
-            type="submit"
-            class="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
-          >
-            Actualizar Artículo
-          </button>
-        </div>
-      </form>
+            <button
+              type="submit"
+              class="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+            >
+              Actualizar Artículo
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
-</div>
 
-<script>
-  interface ArticuloFormData {
-    descripcion: string;
-    precioAlquiler: string;
-    precioProveedor: string;
-    cantidad: string;
-    reparacion: string;
-    proveedorId: string;
-    categoriaId: string;
-  }
-
-  interface Articulo {
-    id: number;
-    descripcion: string;
-    precioAlquiler: number;
-    precioProveedor: number;
-    cantidad: number;
-    disponible: number;
-    reparacion: number;
-    proveedorId: number;
-    categoriaId: number;
-  }
-
-  function normalize(text: string | null): string {
-    return text
-      ? text
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-      : "";
-  }
-
-  document.addEventListener("DOMContentLoaded", function () {
-    const modalAgregar = document.getElementById("modalAgregarArticulo");
-    const modalEditar = document.getElementById("modalEditarArticulo");
-    const openBtn = document.getElementById("agregarArticulo");
-    const closeBtnAgregar = document.getElementById("cancelarModalArticulo");
-    const closeBtnEditar = document.getElementById("cancelarModalEditar");
-    const formAgregar = document.getElementById(
-      "formAgregarArticulo"
-    ) as HTMLFormElement;
-    const formEditar = document.getElementById(
-      "formEditarArticulo"
-    ) as HTMLFormElement;
-    const inputSearch = document.getElementById(
-      "inputSearch"
-    ) as HTMLInputElement;
-    const tableBody = document.querySelector("tbody");
-
-    // Abrir modal de agregar
-    openBtn?.addEventListener("click", () => {
-      modalAgregar?.classList.remove("hidden");
-    });
-
-    // Funciones para cerrar modales
-    function closeModalAgregar() {
-      modalAgregar?.classList.add("hidden");
+  <script>
+    interface ArticuloFormData {
+      descripcion: string;
+      precioAlquiler: string;
+      precioProveedor: string;
+      cantidad: string;
+      reparacion: string;
+      proveedorId: string;
+      categoriaId: string;
     }
 
-    function closeModalEditar() {
-      modalEditar?.classList.add("hidden");
+    interface Articulo {
+      id: number;
+      descripcion: string;
+      precioAlquiler: number;
+      precioProveedor: number;
+      cantidad: number;
+      disponible: number;
+      reparacion: number;
+      proveedorId: number;
+      categoriaId: number;
     }
 
-    closeBtnAgregar?.addEventListener("click", closeModalAgregar);
-    closeBtnEditar?.addEventListener("click", closeModalEditar);
+    function normalize(text: string | null): string {
+      return text
+        ? text
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+        : "";
+    }
 
-    modalAgregar?.addEventListener("click", (e) => {
-      if (e.target === modalAgregar) closeModalAgregar();
-    });
+    document.addEventListener("DOMContentLoaded", function () {
+      const modalAgregar = document.getElementById("modalAgregarArticulo");
+      const modalEditar = document.getElementById("modalEditarArticulo");
+      const openBtn = document.getElementById("agregarArticulo");
+      const closeBtnAgregar = document.getElementById("cancelarModalArticulo");
+      const closeBtnEditar = document.getElementById("cancelarModalEditar");
+      const formAgregar = document.getElementById(
+        "formAgregarArticulo"
+      ) as HTMLFormElement;
+      const formEditar = document.getElementById(
+        "formEditarArticulo"
+      ) as HTMLFormElement;
+      const inputSearch = document.getElementById(
+        "inputSearch"
+      ) as HTMLInputElement;
+      const tableBody = document.querySelector("tbody");
 
-    modalEditar?.addEventListener("click", (e) => {
-      if (e.target === modalEditar) closeModalEditar();
-    });
-
-    // Búsqueda en la tabla
-    function searchTable() {
-      const searchTerm = normalize(inputSearch.value);
-      const rows = tableBody?.querySelectorAll("tr") || [];
-
-      rows.forEach((row) => {
-        const descripcion = normalize(row.children[1].textContent);
-        const proveedor = normalize(row.children[4].textContent);
-        const categoria = normalize(row.children[5].textContent);
-
-        const matches =
-          descripcion.includes(searchTerm) ||
-          proveedor.includes(searchTerm) ||
-          categoria.includes(searchTerm);
-
-        row.style.display = matches ? "" : "none";
+      // Abrir modal de agregar
+      openBtn?.addEventListener("click", () => {
+        modalAgregar?.classList.remove("hidden");
       });
-    }
 
-    inputSearch?.addEventListener("input", searchTable);
-
-    // Configurar botones de eliminar
-    function setupDeleteButtons() {
-      const deleteButtons = document.querySelectorAll("button.text-red-600");
-
-      deleteButtons.forEach((button) => {
-        button.addEventListener("click", async function () {
-          const id = this.getAttribute("data-id");
-
-          if (
-            confirm(`¿Está seguro que desea eliminar el artículo con ID ${id}?`)
-          ) {
-            try {
-              const response = await fetch(
-                `http://localhost:5183/api/Articulos/${id}`,
-                {
-                  method: "DELETE",
-                }
-              );
-
-              if (response.ok) {
-                alert("Artículo eliminado correctamente");
-                window.location.reload();
-              } else {
-                throw new Error("Error al eliminar el artículo");
-              }
-            } catch (error) {
-              alert((error as Error).message);
-              console.error("Error:", error);
-            }
-          }
-        });
-      });
-    }
-
-    // Configurar botones de editar
-    function setupUpdateButtons() {
-      const updateButtons = document.querySelectorAll("button.text-blue-600");
-
-      updateButtons.forEach((button) => {
-        button.addEventListener("click", function () {
-          const articuloData = this.getAttribute("data-articulo");
-          if (!articuloData) return;
-
-          const articulo: Articulo = JSON.parse(articuloData);
-
-          (
-            document.getElementById("editarArticuloId") as HTMLInputElement
-          ).value = articulo.id.toString();
-          (
-            document.getElementById("editarDescripcion") as HTMLInputElement
-          ).value = articulo.descripcion;
-          (
-            document.getElementById("editarPrecioAlquiler") as HTMLInputElement
-          ).value = articulo.precioAlquiler.toString();
-          (
-            document.getElementById("editarPrecioProveedor") as HTMLInputElement
-          ).value = articulo.precioProveedor.toString();
-          (
-            document.getElementById("editarCantidad") as HTMLInputElement
-          ).value = articulo.cantidad.toString();
-          (
-            document.getElementById("editarReparacion") as HTMLInputElement
-          ).value = articulo.reparacion.toString();
-          (
-            document.getElementById("editarProveedorId") as HTMLSelectElement
-          ).value = articulo.proveedorId.toString();
-          (
-            document.getElementById("editarCategoriaId") as HTMLSelectElement
-          ).value = articulo.categoriaId.toString();
-
-          modalEditar?.classList.remove("hidden");
-        });
-      });
-    }
-
-    setupDeleteButtons();
-    setupUpdateButtons();
-
-    // Enviar formulario de agregar
-    formAgregar?.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      if (!formAgregar) return;
-
-      const submitBtn = formAgregar.querySelector(
-        'button[type="submit"]'
-      ) as HTMLButtonElement;
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = "Guardando...";
-
-      try {
-        const formData = new FormData(formAgregar);
-
-        const formValues = Object.fromEntries(
-          formData.entries()
-        ) as unknown as ArticuloFormData;
-
-        const articuloData = {
-          descripcion: formValues.descripcion,
-          precioAlquiler: parseFloat(formValues.precioAlquiler),
-          precioProveedor: parseFloat(formValues.precioProveedor),
-          cantidad: parseInt(formValues.cantidad),
-          disponible:
-            parseInt(formValues.cantidad) -
-            (parseInt(formValues.reparacion) || 0),
-          reparacion: parseInt(formValues.reparacion) || 0,
-          proveedorId: parseInt(formValues.proveedorId),
-          categoriaId: parseInt(formValues.categoriaId),
-        };
-
-        console.log("aquiii Articulo Data:", articuloData);
-
-        const response = await fetch("http://localhost:5183/api/Articulos", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(articuloData),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Error al guardar el artículo");
-        }
-
-        alert("Artículo guardado correctamente");
-        window.location.reload();
-      } catch (error) {
-        alert((error as Error).message);
-        console.error("Error:", error);
-      } finally {
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = "Guardar Artículo";
-        }
+      // Funciones para cerrar modales
+      function closeModalAgregar() {
+        modalAgregar?.classList.add("hidden");
       }
-    });
 
-    // Enviar formulario de editar
-    formEditar?.addEventListener("submit", async (e) => {
-      e.preventDefault();
+      function closeModalEditar() {
+        modalEditar?.classList.add("hidden");
+      }
 
-      if (!formEditar) return;
+      closeBtnAgregar?.addEventListener("click", closeModalAgregar);
+      closeBtnEditar?.addEventListener("click", closeModalEditar);
 
-      const submitBtn = formEditar.querySelector(
-        'button[type="submit"]'
-      ) as HTMLButtonElement;
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = "Actualizando...";
+      modalAgregar?.addEventListener("click", (e) => {
+        if (e.target === modalAgregar) closeModalAgregar();
+      });
 
-      try {
-        const formData = new FormData(formEditar);
-        const id = formData.get("id") as string;
+      modalEditar?.addEventListener("click", (e) => {
+        if (e.target === modalEditar) closeModalEditar();
+      });
 
-        const formValues = Object.fromEntries(
-          formData.entries()
-        ) as unknown as ArticuloFormData;
+      // Búsqueda en la tabla
+      function searchTable() {
+        const searchTerm = normalize(inputSearch.value);
+        const rows = tableBody?.querySelectorAll("tr") || [];
 
-        const articuloData = {
-          id: parseInt(id),
-          descripcion: formValues.descripcion,
-          precioAlquiler: parseFloat(formValues.precioAlquiler),
-          precioProveedor: parseFloat(formValues.precioProveedor),
-          cantidad: parseInt(formValues.cantidad),
-          disponible:
-            parseInt(formValues.cantidad) -
-            (parseInt(formValues.reparacion) || 0),
-          reparacion: parseInt(formValues.reparacion) || 0,
-          proveedorId: parseInt(formValues.proveedorId),
-          categoriaId: parseInt(formValues.categoriaId),
-        };
+        rows.forEach((row) => {
+          const descripcion = normalize(row.children[1].textContent);
+          const proveedor = normalize(row.children[4].textContent);
+          const categoria = normalize(row.children[5].textContent);
 
-        const response = await fetch(
-          `http://localhost:5183/api/Articulos/${id}`,
-          {
-            method: "PUT",
+          const matches =
+            descripcion.includes(searchTerm) ||
+            proveedor.includes(searchTerm) ||
+            categoria.includes(searchTerm);
+
+          row.style.display = matches ? "" : "none";
+        });
+      }
+
+      inputSearch?.addEventListener("input", searchTable);
+
+      // Configurar botones de eliminar
+      function setupDeleteButtons() {
+        const deleteButtons = document.querySelectorAll("button.text-red-600");
+
+        deleteButtons.forEach((button) => {
+          button.addEventListener("click", async function () {
+            const id = this.getAttribute("data-id");
+
+            if (
+              confirm(
+                `¿Está seguro que desea eliminar el artículo con ID ${id}?`
+              )
+            ) {
+              try {
+                const response = await fetch(
+                  `http://localhost:5183/api/Articulos/${id}`,
+                  {
+                    method: "DELETE",
+                  }
+                );
+
+                if (response.ok) {
+                  alert("Artículo eliminado correctamente");
+                  window.location.reload();
+                } else {
+                  throw new Error("Error al eliminar el artículo");
+                }
+              } catch (error) {
+                alert((error as Error).message);
+                console.error("Error:", error);
+              }
+            }
+          });
+        });
+      }
+
+      // Configurar botones de editar
+      function setupUpdateButtons() {
+        const updateButtons = document.querySelectorAll("button.text-blue-600");
+
+        updateButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const articuloData = this.getAttribute("data-articulo");
+            if (!articuloData) return;
+
+            const articulo: Articulo = JSON.parse(articuloData);
+
+            (
+              document.getElementById("editarArticuloId") as HTMLInputElement
+            ).value = articulo.id.toString();
+            (
+              document.getElementById("editarDescripcion") as HTMLInputElement
+            ).value = articulo.descripcion;
+            (
+              document.getElementById(
+                "editarPrecioAlquiler"
+              ) as HTMLInputElement
+            ).value = articulo.precioAlquiler.toString();
+            (
+              document.getElementById(
+                "editarPrecioProveedor"
+              ) as HTMLInputElement
+            ).value = articulo.precioProveedor.toString();
+            (
+              document.getElementById("editarCantidad") as HTMLInputElement
+            ).value = articulo.cantidad.toString();
+            (
+              document.getElementById("editarReparacion") as HTMLInputElement
+            ).value = articulo.reparacion.toString();
+            (
+              document.getElementById("editarProveedorId") as HTMLSelectElement
+            ).value = articulo.proveedorId.toString();
+            (
+              document.getElementById("editarCategoriaId") as HTMLSelectElement
+            ).value = articulo.categoriaId.toString();
+
+            modalEditar?.classList.remove("hidden");
+          });
+        });
+      }
+
+      setupDeleteButtons();
+      setupUpdateButtons();
+
+      // Enviar formulario de agregar
+      formAgregar?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        if (!formAgregar) return;
+
+        const submitBtn = formAgregar.querySelector(
+          'button[type="submit"]'
+        ) as HTMLButtonElement;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = "Guardando...";
+
+        try {
+          const formData = new FormData(formAgregar);
+
+          const formValues = Object.fromEntries(
+            formData.entries()
+          ) as unknown as ArticuloFormData;
+
+          const articuloData = {
+            descripcion: formValues.descripcion,
+            precioAlquiler: parseFloat(formValues.precioAlquiler),
+            precioProveedor: parseFloat(formValues.precioProveedor),
+            cantidad: parseInt(formValues.cantidad),
+            disponible:
+              parseInt(formValues.cantidad) -
+              (parseInt(formValues.reparacion) || 0),
+            reparacion: parseInt(formValues.reparacion) || 0,
+            proveedorId: parseInt(formValues.proveedorId),
+            categoriaId: parseInt(formValues.categoriaId),
+          };
+
+          console.log("aquiii Articulo Data:", articuloData);
+
+          const response = await fetch("http://localhost:5183/api/Articulos", {
+            method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify(articuloData),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(
+              errorData.message || "Error al guardar el artículo"
+            );
           }
-        );
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(
-            errorData.message || "Error al actualizar el artículo"
+          alert("Artículo guardado correctamente");
+          window.location.reload();
+        } catch (error) {
+          alert((error as Error).message);
+          console.error("Error:", error);
+        } finally {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = "Guardar Artículo";
+          }
+        }
+      });
+
+      // Enviar formulario de editar
+      formEditar?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        if (!formEditar) return;
+
+        const submitBtn = formEditar.querySelector(
+          'button[type="submit"]'
+        ) as HTMLButtonElement;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = "Actualizando...";
+
+        try {
+          const formData = new FormData(formEditar);
+          const id = formData.get("id") as string;
+
+          const formValues = Object.fromEntries(
+            formData.entries()
+          ) as unknown as ArticuloFormData;
+
+          const articuloData = {
+            id: parseInt(id),
+            descripcion: formValues.descripcion,
+            precioAlquiler: parseFloat(formValues.precioAlquiler),
+            precioProveedor: parseFloat(formValues.precioProveedor),
+            cantidad: parseInt(formValues.cantidad),
+            disponible:
+              parseInt(formValues.cantidad) -
+              (parseInt(formValues.reparacion) || 0),
+            reparacion: parseInt(formValues.reparacion) || 0,
+            proveedorId: parseInt(formValues.proveedorId),
+            categoriaId: parseInt(formValues.categoriaId),
+          };
+
+          const response = await fetch(
+            `http://localhost:5183/api/Articulos/${id}`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(articuloData),
+            }
           );
-        }
 
-        alert("Artículo actualizado correctamente");
-        window.location.reload();
-      } catch (error) {
-        alert((error as Error).message);
-        console.error("Error:", error);
-      } finally {
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = "Actualizar Artículo";
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(
+              errorData.message || "Error al actualizar el artículo"
+            );
+          }
+
+          alert("Artículo actualizado correctamente");
+          window.location.reload();
+        } catch (error) {
+          alert((error as Error).message);
+          console.error("Error:", error);
+        } finally {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = "Actualizar Artículo";
+          }
         }
-      }
+      });
     });
-  });
-</script>
+  </script>
+</div>

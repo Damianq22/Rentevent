@@ -479,14 +479,19 @@ const formatDate = (dateString) => {
         const selectedOption = this.options[this.selectedIndex];
         cantidadInput.value = "";
         subtotalArticuloDisplay.textContent = "$0.00";
+
         if (this.value && selectedOption.dataset.precio) {
           cantidadInput.disabled = false;
           cantidadInput.max = selectedOption.dataset.disponible;
           costoArticuloDisplay.textContent = `$${parseFloat(selectedOption.dataset.precio).toFixed(2)}`;
+
+          cantidadInput.dataset.disponible = selectedOption.dataset.disponible;
         } else {
           cantidadInput.disabled = true;
           costoArticuloDisplay.textContent = "$0.00";
+          delete cantidadInput.dataset.disponible;
         }
+
         updateTotalAlquiler();
       });
 
@@ -588,7 +593,13 @@ const formatDate = (dateString) => {
               hayArticulosInvalidos = true;
               return;
             }
-            detallesArticulos.push({ articuloId, cantidad });
+
+            detallesArticulos.push({
+              articuloId,
+              cantidad,
+              disponible,
+              cantidadARestar: disponible - cantidad,
+            });
           }
         });
 
@@ -648,6 +659,11 @@ const formatDate = (dateString) => {
           Estado: "Pendiente",
           ClienteId: clienteId,
           UsuarioId: usuarioId,
+          Articulos: detallesArticulos.map((detalle) => ({
+            ArticuloId: detalle.articuloId,
+            Cantidad: detalle.cantidad,
+            CantidadARestar: detalle.disponible - detalle.cantidad,
+          })),
         };
 
         console.log("Nuevo ID de alquiler:", datosAlquiler);
