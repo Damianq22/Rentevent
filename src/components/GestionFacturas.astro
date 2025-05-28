@@ -329,62 +329,52 @@ const estados = ["Todos", "Alquilado", "Pendiente", "Devuelto"];
       .addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        const cantidad = parseInt(inputCantidad.value);
-        const max = parseInt(inputCantidad.max);
-        const alquilerId = inputAlquilerId.value;
-        const articuloId = inputArticuloId.value;
+        const cantidadDanada = parseInt(
+          document.getElementById("modalCantidad").value
+        );
+        const maxCantidad = parseInt(
+          document.getElementById("maxCantidad").textContent
+        );
+        const alquilerId = document.getElementById("modalAlquilerId").value;
+        const articuloId = document.getElementById("modalArticuloId").value;
 
-        // Validación
-        if (isNaN(cantidad)) {
-          errorCantidad.textContent = "Debe ingresar un número válido";
-          errorCantidad.classList.remove("hidden");
+        if (cantidadDanada > maxCantidad || cantidadDanada < 0) {
+          document.getElementById("cantidadError").textContent =
+            `La cantidad dañada no puede superar la cantidad alquilada (${maxCantidad}).`;
+          document.getElementById("cantidadError").classList.remove("hidden");
           return;
         }
 
-        if (cantidad < 0 || cantidad > max) {
-          errorCantidad.textContent = `La cantidad debe estar entre 0 y ${max}`;
-          errorCantidad.classList.remove("hidden");
-          return;
-        }
+        const cantidadNoDanada = maxCantidad - cantidadDanada;
+
+        const body = {
+          alquilerId,
+          articuloId,
+          cantidadDanada,
+          cantidadNoDanada,
+        };
 
         try {
-          const submitBtn = e.target.querySelector('button[type="submit"]');
-          submitBtn.disabled = true;
-          submitBtn.innerHTML = '<span class="spinner"></span> Procesando...';
-
-          const response = await fetch(
+          const res = await fetch(
             "http://localhost:5183/api/AlquileresControllerDTO/reportar-danado",
             {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify({
-                AlquilerId: alquilerId,
-                ArticuloId: articuloId,
-                CantidadDanada: cantidad,
-              }),
+              body: JSON.stringify(body),
             }
           );
 
-          const result = await response.json();
-
-          if (!response.ok) {
-            throw new Error(result.message || "Error al enviar el reporte");
+          if (res.ok) {
+            alert("Reporte enviado con éxito.");
+            location.reload();
+          } else {
+            alert("Error al enviar el reporte.");
           }
-
-          alert(result.message || "Reporte enviado correctamente");
-
-          modal.classList.add("hidden");
-          window.location.reload();
-        } catch (error) {
-          console.error("Error:", error);
-          errorCantidad.textContent = error.message;
-          errorCantidad.classList.remove("hidden");
-        } finally {
-          const submitBtn = e.target.querySelector('button[type="submit"]');
-          submitBtn.disabled = false;
-          submitBtn.textContent = "Enviar";
+        } catch (err) {
+          console.error(err);
+          alert("Error de conexión.");
         }
       });
 
