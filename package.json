@@ -16,5 +16,7 @@
     "jsonwebtoken": "^9.0.2",
     "tailwindcss": "^4.1.7"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@astrojs/vercel": "^8.1.4"
+  }
 }

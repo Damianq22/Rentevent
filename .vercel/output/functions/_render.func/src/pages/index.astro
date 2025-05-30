@@ -1,0 +1,136 @@
+---
+import Layout from "../layouts/Layout.astro";
+import "../styles/login.css";
+---
+
+<Layout>
+  <div class="loginPage flex">
+    <div class="container flex">
+      <div class="videoDiv">
+        <video src="/image/clipLogo.mp4" autoplay muted loop></video>
+
+        <div class="footerDiv flex">
+          <span class="text-white">Bienvenido a tu Renta de Alquiler.</span>
+        </div>
+      </div>
+
+      <div
+        class="formDiv w-full h-full flex flex-col justify-center items-center"
+      >
+        <div>
+          <h1 class="title text-4xl font-bold text-center text-pink-800 mb-2">
+            Rent4Even
+          </h1>
+        </div>
+
+        <form id="loginForm" class="form grid">
+          <div class="inputDiv">
+            <label for="username" class="username">Usuario</label>
+            <div class="input flex">
+              <input
+                placeholder="Ingrese su usuario"
+                type="text"
+                id="username"
+                name="email"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="inputDiv">
+            <label for="password" class="password">Contraseña</label>
+            <div class="input flex">
+              <input
+                placeholder="Ingrese su contraseña"
+                type="password"
+                id="password"
+                name="password"
+                required
+              />
+            </div>
+          </div>
+          <button type="submit" class="btn flex">
+            <span>Login</span>
+          </button>
+        </form>
+
+        <div
+          id="errorMessage"
+          class="text-red-700 text-center hidden text-sm mt-4"
+        >
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const loginForm = document.getElementById("loginForm");
+    const errorMessage = document.getElementById("errorMessage");
+
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.classList.remove("hidden");
+    }
+
+    function hideError() {
+      errorMessage.classList.add("hidden");
+    }
+
+    function setCookie(name, value, days) {
+      const expirationDate = new Date();
+      expirationDate.setDate(expirationDate.getDate() + days);
+      document.cookie = `${name}=${value}; expires=${expirationDate.toUTCString()}; path=/`;
+    }
+
+    loginForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      hideError();
+
+      const usuario = (document.getElementById("username") as HTMLInputElement)
+        .value;
+      const contraseña = (
+        document.getElementById("password") as HTMLInputElement
+      ).value;
+
+      if (!usuario || !contraseña) {
+        showError("Por favor complete todos los campos");
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          "https://localhost:7280/api/UsuarioControllerAuth/login",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ usuario, contraseña }),
+          }
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Credenciales incorrectas");
+        }
+
+        const data = await response.json();
+        console.log("Token JWT recibido:", data.token);
+
+        if (!data.token) {
+          throw new Error("Token JWT no recibido del servidor");
+        }
+        setCookie("jwt", data.token, 1);
+        console.log("Login exitoso. Redirigiendo...");
+        window.location.href = "/gestion";
+      } catch (error) {
+        console.error("Error en el login:", error);
+        showError(
+          error.message || "Error al iniciar sesión. Intente nuevamente."
+        );
+      }
+    });
+  });
+</script>
