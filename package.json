@@ -6,7 +6,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "deploy": "gh-pages -d dist" 
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.7",
@@ -15,5 +16,8 @@
     "https": "^1.0.0",
     "jsonwebtoken": "^9.0.2",
     "tailwindcss": "^4.1.7"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
   }
 }
