@@ -41,10 +41,10 @@ switch (view) {
 import { protectRoute } from "../utils/auth";
 import GestionAlquiler from "../components/GestionAlquiler.astro";
 
-const user = await protectRoute(Astro);
+/*const user = await protectRoute(Astro);
 if (!user) {
   return Astro.redirect("/");
-}
+}*/
 ---
 
 <LayoutGestion>

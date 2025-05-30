@@ -117,13 +117,13 @@ import "../styles/login.css";
         }
 
         const data = await response.json();
+        console.log("Token JWT recibido:", data.token);
 
         if (!data.token) {
           throw new Error("Token JWT no recibido del servidor");
         }
-
         setCookie("jwt", data.token, 1);
-
+        console.log("Login exitoso. Redirigiendo...");
         window.location.href = "/gestion";
       } catch (error) {
         console.error("Error en el login:", error);
